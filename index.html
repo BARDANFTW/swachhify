@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Swachhify</title>
+  <link rel="icon" type="image/png" href="swachhify_logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --main-bg: #B6D83D; /* from logo background */
+      --accent: #3c8c18;
+      --dark: #1a1a1a;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--main-bg);
+      color: var(--dark);
+      transition: 0.4s ease-in-out;
+    }
+
+    header {
+      background: var(--main-bg);
+      color: var(--dark);
+      padding: 20px;
+      text-align: center;
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+      animation: fadeDown 0.8s ease;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #info, #sound-info {
+      padding: 15px;
+      margin: 20px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.6);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      backdrop-filter: blur(6px);
+      animation: fadeIn 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #map {
+      height: 60vh;
+      border-radius: 15px;
+      overflow: hidden;
+      margin: 20px;
+      animation: popIn 0.7s ease;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.95); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    img#bortle-chart {
+      width: 85%;
+      display: block;
+      margin: 40px auto;
+      border-radius: 10px;
+      animation: fadeIn 1.4s ease;
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      margin-left: 20px;
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+.slogan {
+    margin-top: 50px;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 18px;
+    color: white;
+  }
+
+  </style>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <img src="swachhify_logo.png" alt="Swachhify Logo" style=" animation: fadeDown 0.8s ease; height="150px"; width="150px";">
+  <p class="slogan" style=" animation: fadeDown 0.8s ease; height="150px"; width="150px";">SENSE MORE LIVE BETTER</p>
+</header>
+
+<div id="info">
+  <p>📍 <strong>Location:</strong> <span id="coords">Detecting…</span></p>
+  <p>🔭 <strong>Bortle Class:</strong> <span id="bortle">Estimating…</span></p>
+  <p>🌃 <strong>Method:</strong> Tile-based overlay estimation</p>
+</div>
+
+<div id="map"></div>
+
+<h3 class="section-title">📊 Light Level Visibility</h3>
+
+<div id="info">
+<center><img id=\"bortle-chart" src="bortle.png" height="90%" width="100%" alt="Bortle Scale Chart" /></center>
+<p style="text-align: left">Source: https://www.handprint.com/ASTRO/bortle.html</p>
+</div>
+
+<h3 class="section-title">🔊 Sound Pollution Estimate</h3>
+
+<div id="sound-info">
+  <p>🎧 <strong>Noise Level:</strong> <span id="noise">Calculating…</span></p>
+  <p>📡 <strong>Method:</strong> Urban density + traffic proxy estimation</p>
+</div>
+
+<h3 class="section-title">🎤 Live Microphone Noise Check</h3>
+<div id="live-sound" style="padding:15px;margin:20px;border-radius:12px;background:rgba(255,255,255,0.6);box-shadow:0 4px 10px rgba(0,0,0,0.15);backdrop-filter:blur(6px);">
+  <p>🔊 <strong>Live Noise Level:</strong> <span id="live-noise">Click start…</span></p>
+  <button onclick="startMic()" style="padding:10px 20px;border:none;border-radius:8px;background:var(--accent);color:white;font-size:1rem;cursor:pointer;">Start Mic Measurement</button>
+</div>
+
+<h3 class="section-title">📊 Noise Level Health Guide</h3>
+
+<table style="width:90%;margin:20px auto;border-collapse:collapse;font-size:1rem;background:rgba(255,255,255,0.6);backdrop-filter:blur(6px);box-shadow:0 4px 10px rgba(0,0,0,0.15);border-radius:10px;overflow:hidden;border:2px solid black;">
+  <tr style="background:var(--accent);color:black;border:1px solid black;">
+    <th style="padding:10px;border:1px solid black;color:black;">Noise Level (dB)</th>
+    <th style="padding:10px;border:1px solid black;color:black;">Effect on Health</th>
+  </tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">0–30 dB</td><td style="padding:10px;border:1px solid black;color:black;">Very quiet, healthy, ideal for sleep</td></tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">30–60 dB</td><td style="padding:10px;border:1px solid black;color:black;">Normal conversation level, safe</td></tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">60–85 dB</td><td style="padding:10px;border:1px solid black;color:black;">Can cause stress with long exposure</td></tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">85–100 dB</td><td style="padding:10px;border:1px solid black;color:black;">Harmful over time, hearing risk</td></tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">100+ dB</td><td style="padding:10px;border:1px solid black;color:black;">Unsafe, can cause ear damage quickly</td></tr>
+</table>
+
+<br>
+
+<h3 class="section-title">🧪 pH of Common Daily Liquids & Health Impact</h3>
+
+<table style="width:98%;margin:20px auto;border-collapse:collapse;font-size:0.95rem;
+background:rgba(255,255,255,0.65);backdrop-filter:blur(6px);
+box-shadow:0 4px 10px rgba(0,0,0,0.15);
+border-radius:10px;overflow:hidden;border:2px solid black;">
+
+  <tr style="background:var(--accent);color:black;">
+    <th rowspan="2" style="padding:10px;border:1px solid black;">Liquid</th>
+    <th rowspan="2" style="padding:10px;border:1px solid black;">Typical pH</th>
+    <th rowspan="2" style="padding:10px;border:1px solid black;">Why pH Changes</th>
+    <th colspan="2" style="padding:10px;border:1px solid black;">Health Concerns</th>
+  </tr>
+
+  <tr style="background:#cfe87a;">
+    <th style="padding:10px;border:1px solid black;">Lower pH (More Acidic)</th>
+    <th style="padding:10px;border:1px solid black;">Higher pH (More Alkaline)</th>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Drinking Water</td>
+    <td style="padding:10px;border:1px solid black;">6.5 – 8.5</td>
+    <td style="padding:10px;border:1px solid black;">CO₂ dissolution, pipe corrosion, minerals</td>
+    <td style="padding:10px;border:1px solid black;">Stomach irritation, tooth enamel damage</td>
+    <td style="padding:10px;border:1px solid black;">Bitter taste, digestive discomfort</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Milk</td>
+    <td style="padding:10px;border:1px solid black;">6.4 – 6.8</td>
+    <td style="padding:10px;border:1px solid black;">Bacterial growth → lactic acid</td>
+    <td style="padding:10px;border:1px solid black;">Spoilage, food poisoning risk</td>
+    <td style="padding:10px;border:1px solid black;">Usually minimal health impact</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Fruit Juices</td>
+    <td style="padding:10px;border:1px solid black;">2.0 – 4.0</td>
+    <td style="padding:10px;border:1px solid black;">Fermentation, dilution</td>
+    <td style="padding:10px;border:1px solid black;">Enamel erosion, acid reflux</td>
+    <td style="padding:10px;border:1px solid black;">Reduced nutritional quality</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Soft Drinks / Cola</td>
+    <td style="padding:10px;border:1px solid black;">2.3 – 2.8</td>
+    <td style="padding:10px;border:1px solid black;">Carbonation loss</td>
+    <td style="padding:10px;border:1px solid black;">Tooth decay, stomach lining irritation</td>
+    <td style="padding:10px;border:1px solid black;">Less acidic but still unhealthy</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Tea / Coffee</td>
+    <td style="padding:10px;border:1px solid black;">4.5 – 6.5</td>
+    <td style="padding:10px;border:1px solid black;">Brewing strength, additives</td>
+    <td style="padding:10px;border:1px solid black;">Acidity, gastric irritation</td>
+    <td style="padding:10px;border:1px solid black;">Reduced antioxidant effectiveness</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Shampoo / Soap</td>
+    <td style="padding:10px;border:1px solid black;">4.5 – 10.0</td>
+    <td style="padding:10px;border:1px solid black;">Formulation, dilution</td>
+    <td style="padding:10px;border:1px solid black;">Scalp irritation (too acidic)</td>
+    <td style="padding:10px;border:1px solid black;">Skin dryness, barrier damage</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Toothpaste</td>
+    <td style="padding:10px;border:1px solid black;">7.0 – 9.0</td>
+    <td style="padding:10px;border:1px solid black;">Moisture exposure</td>
+    <td style="padding:10px;border:1px solid black;">Increased tooth sensitivity</td>
+    <td style="padding:10px;border:1px solid black;">Mouth irritation if too alkaline</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Vinegar</td>
+    <td style="padding:10px;border:1px solid black;">2.4 – 3.0</td>
+    <td style="padding:10px;border:1px solid black;">Dilution</td>
+    <td style="padding:10px;border:1px solid black;">Throat burn, tooth erosion</td>
+    <td style="padding:10px;border:1px solid black;">Reduced antimicrobial action</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Hand Sanitizer</td>
+    <td style="padding:10px;border:1px solid black;">6.0 – 7.5</td>
+    <td style="padding:10px;border:1px solid black;">Alcohol evaporation</td>
+    <td style="padding:10px;border:1px solid black;">Skin irritation</td>
+    <td style="padding:10px;border:1px solid black;">Dryness, microbiome damage</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Blood (Reference)</td>
+    <td style="padding:10px;border:1px solid black;">7.35 – 7.45</td>
+    <td style="padding:10px;border:1px solid black;">Respiratory/metabolic imbalance</td>
+    <td style="padding:10px;border:1px solid black;">Acidosis – life-threatening</td>
+    <td style="padding:10px;border:1px solid black;">Alkalosis – life-threatening</td>
+  </tr>
+
+</table>
+
+<script>
+  function estimateBortle(lat) {
+    if (lat > 60 || lat < -60) return "2–3 (Generally dark)";
+    return "5–7 (Suburban average)";
+  }
+
+  function estimateNoise(lat, lon) {
+    if (lat > 55) return "Low – Mostly natural environment";
+    return "Medium to High – Typical urban noise";
+  }
+
+  function initMap(lat, lon) {
+    document.getElementById("coords").innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+
+    const map = L.map("map").setView([lat, lon], 9);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap"
+    }).addTo(map);
+
+    L.tileLayer("https://tiles.lightpollutionmap.info/tiles/world/{z}/{x}/{y}.png", {
+      opacity: 0.75,
+      attribution: "Light Pollution Map"
+    }).addTo(map);
+
+    L.marker([lat, lon]).addTo(map)
+      .bindPopup("You are here 🌎")
+      .openPopup();
+
+    document.getElementById("bortle").innerText = estimateBortle(lat);
+    document.getElementById("noise").innerText = estimateNoise(lat, lon);
+  }
+
+  function getLocation() {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      pos => initMap(pos.coords.latitude, pos.coords.longitude),
+      () => alert("Location access denied")
+    );
+  }
+
+  getLocation();
+
+async function startMic() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(stream);
+
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    function measure() {
+      analyser.getByteFrequencyData(dataArray);
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+      const average = sum / dataArray.length;
+
+      const db = Math.round((average / 255) * 100);
+      document.getElementById("live-noise").innerText = db + " dB (approx)";
+
+      requestAnimationFrame(measure);
+
+      if (db > 100) {
+        const buzz = new AudioContext();
+        const oscillator = buzz.createOscillator();
+        oscillator.frequency.setValueAtTime(600, buzz.currentTime);
+        oscillator.connect(buzz.destination);
+        oscillator.start();
+        setTimeout(() => oscillator.stop(), 300);
+      }
+    }
+
+    measure();
+  } catch (err) {
+    document.getElementById("live-noise").innerText = "Microphone access denied";
+  }
+}
+</script>
+
+
+
+</body>
+</html>
