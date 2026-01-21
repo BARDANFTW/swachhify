@@ -347,7 +347,31 @@ async function startMic() {
 setInterval(fetchLiveData, 5000);
 fetchLiveData();
 </script>
+<script>
+async function fetchAQI() {
+  try {
+    const res = await fetch("/api/data"); // fetch from Vercel API
+    const data = await res.json();
 
+    // Update the AQI display on your page
+    // Make sure you have an element with id="aqi-display"
+    document.getElementById("aqi-display").innerText = data.aqi;
+
+    // Optional: Change color based on AQI
+    const el = document.getElementById("aqi-display");
+    if (data.aqi <= 700) el.style.color = "green";
+    else if (data.aqi <= 1500) el.style.color = "orange";
+    else el.style.color = "red";
+
+  } catch (err) {
+    console.error("Failed to fetch AQI:", err);
+  }
+}
+
+// Fetch every 5 seconds
+setInterval(fetchAQI, 5000);
+fetchAQI();
+</script>
 
 
 </body>
