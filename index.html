@@ -5,23 +5,70 @@
 <title>Swachhify</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <style>
+:root {
+  --main-bg:#B6D83D;
+  --accent:#3c8c18;
+  --dark:#1a1a1a;
+}
+
 body{
   margin:0;
   font-family:Poppins,sans-serif;
-  background:#B6D83D;
+  background:var(--main-bg);
+  color:var(--dark);
 }
 
+/* HEADER */
 header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:24px 16px;
   text-align:center;
-  padding:20px;
+  animation:fadeDown 0.8s ease;
+}
+
+.logo{
+  width:120px;
+  max-width:70vw;
+  height:auto;
+  display:block;
+  margin:0 auto;
+}
+
+.slogan{
+  margin-top:10px;
+  font-weight:600;
+  letter-spacing:4px;
   color:white;
 }
 
+/* ANIMATIONS */
+@keyframes fadeDown{
+  from{opacity:0;transform:translateY(-20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+
+@keyframes popIn{
+  0%{transform:scale(0.95);opacity:0;}
+  100%{transform:scale(1);opacity:1;}
+}
+
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(0,0,0,.3);}
+  70%{box-shadow:0 0 0 14px rgba(0,0,0,0);}
+}
+
+/* DASHBOARD GRID */
 .dashboard{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -33,10 +80,12 @@ header{
   background:rgba(255,255,255,.7);
   padding:20px;
   border-radius:16px;
+  animation:popIn 0.7s ease;
 }
 
-#map{height:320px;border-radius:12px}
+#map{height:300px;border-radius:12px;}
 
+/* AQI BOX */
 .aqi{
   font-size:2rem;
   padding:10px;
@@ -44,90 +93,92 @@ header{
   margin-top:10px;
   animation:pulse 2s infinite;
 }
+.good{background:#7ed957;}
+.moderate{background:#ffd93d;}
+.poor{background:#ff6b6b;}
 
-.good{background:#7ed957}
-.moderate{background:#ffd93d}
-.poor{background:#ff6b6b}
-
-@keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(0,0,0,.3)}
-  70%{box-shadow:0 0 0 14px rgba(0,0,0,0)}
-}
-
+/* MOBILE RESPONSIVE */
 @media(max-width:768px){
-  .dashboard{grid-template-columns:1fr}
+  .dashboard{grid-template-columns:1fr;}
+  .logo{width:90px;}
 }
+
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>Swachhify</h1>
-  <p>SENSE MORE · LIVE BETTER</p>
+  <img src="assets/swachhify_logo.png" alt="Swachhify Logo" class="logo">
+  <p class="slogan">SENSE MORE · LIVE BETTER</p>
 </header>
 
 <div class="dashboard">
 
-<div class="card">
-  <p><b>Location:</b> <span id="loc">Loading…</span></p>
-  <p><b>Light Pollution:</b> <span id="light">Calculating…</span></p>
-  <div id="aqiBox" class="aqi">AQI: --</div>
+  <!-- LEFT CARD: Info -->
+  <div class="card">
+    <p><b>Location:</b> <span id="loc">Loading…</span></p>
+    <p><b>Light Pollution:</b> <span id="light">Estimating…</span></p>
+    <div id="aqiBox" class="aqi">AQI: --</div>
+  </div>
+
+  <!-- RIGHT CARD: Map -->
+  <div class="card">
+    <div id="map"></div>
+  </div>
+
 </div>
 
-<div class="card">
-  <div id="map"></div>
-</div>
-
-</div>
-
+<!-- NOISE MONITOR -->
 <div class="card" style="margin:20px">
   <h3>Noise Level</h3>
   <p id="noise">Idle</p>
-  <button onclick="startNoise()">Start Mic</button>
+  <button onclick="startNoise()">Start Microphone</button>
+</div>
+
+<!-- LIGHT POLLUTION CHART -->
+<div class="card" style="margin:20px">
+  <h3>Light Pollution (Bortle Scale)</h3>
+  <img src="assets/bortle.png" alt="Bortle Chart" style="width:100%;border-radius:12px;">
+  <p style="text-align:right;font-size:0.9rem;">Source: handprint.com</p>
 </div>
 
 <script>
-/* -------- MAP & LOCATION -------- */
+/* ======== MAP & LOCATION ======== */
 navigator.geolocation.getCurrentPosition(pos=>{
   const lat=pos.coords.latitude;
   const lon=pos.coords.longitude;
-
-  document.getElementById("loc").innerText =
-    lat.toFixed(3)+", "+lon.toFixed(3);
-
-  document.getElementById("light").innerText =
-    lat>60 ? "Low (Bortle 3)" : "Moderate (Bortle 6)";
+  document.getElementById("loc").innerText=lat.toFixed(3)+", "+lon.toFixed(3);
+  document.getElementById("light").innerText=lat>60?"Low (Bortle 3)":"Moderate (Bortle 6)";
 
   const map=L.map("map").setView([lat,lon],9);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-  L.marker([lat,lon]).addTo(map);
+  L.marker([lat,lon]).addTo(map).bindPopup("You are here 🌎").openPopup();
 });
 
-/* -------- AQI FROM ESP32 (ThingSpeak) -------- */
-const CHANNEL_ID = "YOUR_CHANNEL_ID";
-const READ_KEY = "YOUR_READ_API_KEY";
+/* ======== AQI FETCH FROM THINGSPEAK ======== */
+const CHANNEL_ID = "YOUR_CHANNEL_ID"; // REPLACE
+const READ_KEY = "YOUR_READ_API_KEY"; // REPLACE
 
 async function fetchAQI(){
-  const url =
-    `https://api.thingspeak.com/channels/${CHANNEL_ID}/fields/1.json?api_key=${READ_KEY}&results=1`;
-  const res = await fetch(url);
-  const data = await res.json();
-  const aqi = parseInt(data.feeds[0].field1);
+  try{
+    const url=`https://api.thingspeak.com/channels/${CHANNEL_ID}/fields/1.json?api_key=${READ_KEY}&results=1`;
+    const res=await fetch(url);
+    const data=await res.json();
+    const aqi=parseInt(data.feeds[0].field1);
 
-  const box=document.getElementById("aqiBox");
-  box.innerText="AQI: "+aqi;
-  box.className="aqi";
-
-  if(aqi<=50) box.classList.add("good");
-  else if(aqi<=100) box.classList.add("moderate");
-  else box.classList.add("poor");
+    const box=document.getElementById("aqiBox");
+    box.innerText="AQI: "+aqi;
+    box.className="aqi";
+    if(aqi<=50) box.classList.add("good");
+    else if(aqi<=100) box.classList.add("moderate");
+    else box.classList.add("poor");
+  }catch(e){console.log("AQI fetch failed");}
 }
-
 setInterval(fetchAQI,5000);
 fetchAQI();
 
-/* -------- NOISE -------- */
+/* ======== MICROPHONE NOISE ======== */
 async function startNoise(){
   try{
     const stream=await navigator.mediaDevices.getUserMedia({audio:true});
@@ -139,13 +190,12 @@ async function startNoise(){
     function loop(){
       analyser.getByteFrequencyData(data);
       let avg=data.reduce((a,b)=>a+b,0)/data.length;
-      document.getElementById("noise").innerText =
-        Math.round(avg/255*100)+" dB";
+      document.getElementById("noise").innerText=Math.round(avg/255*100)+" dB";
       requestAnimationFrame(loop);
     }
     loop();
   }catch{
-    document.getElementById("noise").innerText="Permission blocked";
+    document.getElementById("noise").innerText="Microphone access blocked";
   }
 }
 </script>
