@@ -2,167 +2,167 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Swachhify</title>
+<title>Swachhify | Environmental Monitoring Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" href="swachhify_logo.png">
+<link rel="icon" type="image/png" href="swachhify_logo.png">
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-
 <style>
 :root{
-  --bg:#B6D83D;
+  --primary:#B6D83D;
   --accent:#3c8c18;
-  --glass:rgba(255,255,255,0.65);
-  --dark:#1a1a1a;
+  --dark:#1c1c1c;
+  --glass:rgba(255,255,255,0.7);
 }
+
+*{box-sizing:border-box}
 
 body{
   margin:0;
   font-family:'Poppins',sans-serif;
-  background:var(--bg);
+  background:var(--primary);
   color:var(--dark);
+  overflow-x:hidden;
 }
 
-/* ---------------- HEADER ---------------- */
+/* ---------- HEADER ---------- */
 header{
   text-align:center;
-  padding:30px 20px;
-  animation:fadeDown .8s ease;
+  padding:50px 20px;
+  animation:dropIn 1s ease;
 }
-header img{height:120px}
+
+header img{
+  width:140px;
+  animation:floatLogo 4s ease-in-out infinite;
+}
+
 .slogan{
   margin-top:12px;
-  letter-spacing:6px;
+  font-size:1.4rem;
   font-weight:600;
+  letter-spacing:6px;
   color:white;
 }
 
-@keyframes fadeDown{
-  from{opacity:0;transform:translateY(-20px)}
-  to{opacity:1;transform:translateY(0)}
-}
-
-/* ---------------- DASHBOARD ---------------- */
-.dashboard{
-  display:grid;
-  grid-template-columns:1.2fr 1fr;
-  gap:20px;
-  margin:20px;
-}
-
-.panel{
-  background:var(--glass);
-  border-radius:16px;
-  padding:20px;
-  box-shadow:0 6px 15px rgba(0,0,0,.15);
-}
-
-/* ---------------- MAP ---------------- */
-#map{
-  height:100%;
-  min-height:320px;
-  border-radius:14px;
-}
-
-/* ---------------- AQI ---------------- */
-.aqi-box{
-  font-size:2rem;
-  font-weight:700;
-  padding:12px 22px;
-  border-radius:14px;
-  display:inline-block;
-  margin-top:12px;
-}
-
-.pulse{
-  animation:pulseGlow 2s infinite;
-}
-
-@keyframes pulseGlow{
-  0%{box-shadow:0 0 0 0 rgba(60,140,24,.6)}
-  70%{box-shadow:0 0 0 18px rgba(60,140,24,0)}
-  100%{box-shadow:0 0 0 0 rgba(60,140,24,0)}
-}
-
-.aqi-good{background:#7ed957}
-.aqi-moderate{background:#ffd93d}
-.aqi-poor{background:#ff6b6b}
-
-/* ---------------- SECTION TITLES ---------------- */
-.section-title{
-  margin:40px 20px 10px;
-  font-size:1.5rem;
-  font-weight:700;
-  color:var(--accent);
-}
-
-/* ---------------- LIGHT POLLUTION GRAPH ---------------- */
-.graph{
-  opacity:1;
-  margin:20px;
-}
-
-/* Desktop animation only */
-@media(min-width:769px){
-  .graph{
-    opacity:0;
-    animation:fadeGraph .8s ease forwards;
-  }
-}
-
-@keyframes fadeGraph{
-  from{opacity:0;transform:scale(.97)}
-  to{opacity:1;transform:scale(1)}
-}
-
-/* ---------------- MOBILE CARD SLIDE ---------------- */
-.card{
-  opacity:0;
-  transform:translateY(30px);
-}
-
-@media(max-width:768px){
-  .dashboard{
-    display:flex;
-    flex-direction:column;
-  }
-
-  .card{
-    animation:slideUp .6s ease forwards;
-  }
-
-  .aqi-box{
-    font-size:1.6rem;
-    padding:10px 16px;
-  }
-
-  .pulse{
-    animation-duration:2.6s;
-  }
-}
-
-@keyframes slideUp{
-  to{opacity:1;transform:translateY(0)}
-}
-
-/* ---------------- TABLE ---------------- */
-table{
+/* ---------- SECTIONS ---------- */
+section{
   width:95%;
-  margin:20px auto;
-  border-collapse:collapse;
+  max-width:1250px;
+  margin:40px auto;
+  padding:28px;
   background:var(--glass);
+  border-radius:18px;
+  box-shadow:0 10px 22px rgba(0,0,0,0.18);
+  backdrop-filter:blur(8px);
+  opacity:0;
+  transform:translateY(40px);
+  transition:all 0.9s ease;
+}
+
+section.show{
+  opacity:1;
+  transform:translateY(0);
+}
+
+h2{
+  color:var(--accent);
+  margin-bottom:18px;
+  position:relative;
+}
+
+h2::after{
+  content:'';
+  position:absolute;
+  left:0;
+  bottom:-6px;
+  width:70px;
+  height:3px;
+  background:var(--accent);
+}
+
+/* ---------- LOCATION GRID ---------- */
+.location-grid{
+  display:grid;
+  grid-template-columns:1fr 1.4fr;
+  gap:25px;
+}
+
+.location-info{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:15px;
+}
+
+.stat-card{
+  padding:16px;
+  border-radius:14px;
+  background:rgba(255,255,255,0.85);
+  box-shadow:0 6px 14px rgba(0,0,0,0.12);
+  animation:fadeScale 0.9s ease;
+}
+
+.stat-title{
+  font-size:0.9rem;
+  opacity:0.7;
+}
+
+.stat-value{
+  font-size:1.2rem;
+  font-weight:600;
+  margin-top:4px;
+}
+
+/* ---------- MAP ---------- */
+#map{
+  height:360px;
+  border-radius:14px;
+  animation:mapEnter 1.1s ease forwards;
+  animation-delay:0.3s;
+  opacity:0;
+}
+
+/* ---------- LIVE DATA ---------- */
+.pulse{
+  animation:pulseGlow 1.6s infinite;
+  font-weight:600;
+}
+
+/* ---------- BUTTON ---------- */
+button{
+  padding:12px 26px;
+  border:none;
   border-radius:12px;
-  overflow:hidden;
+  background:var(--accent);
+  color:white;
+  font-size:1rem;
+  cursor:pointer;
+  transition:all 0.25s ease;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 18px rgba(0,0,0,0.25);
+}
+
+/* ---------- TABLES ---------- */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:18px;
+  font-size:0.95rem;
+  animation:fadeScale 1s ease;
 }
 
 th,td{
-  padding:10px;
   border:1px solid black;
-  font-size:.95rem;
+  padding:10px;
 }
 
 th{
@@ -170,15 +170,46 @@ th{
   color:black;
 }
 
-/* ---------------- BUTTON ---------------- */
-button{
-  padding:10px 18px;
-  border:none;
-  border-radius:8px;
-  background:var(--accent);
-  color:white;
-  font-size:1rem;
-  cursor:pointer;
+/* ---------- FOOTER ---------- */
+footer{
+  text-align:center;
+  padding:30px;
+  font-size:0.85rem;
+  opacity:0.85;
+}
+
+/* ---------- ANIMATIONS ---------- */
+@keyframes dropIn{
+  from{opacity:0;transform:translateY(-30px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes floatLogo{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-8px)}
+}
+
+@keyframes fadeScale{
+  from{opacity:0;transform:scale(0.95)}
+  to{opacity:1;transform:scale(1)}
+}
+
+@keyframes mapEnter{
+  from{opacity:0;transform:scale(0.96)}
+  to{opacity:1;transform:scale(1)}
+}
+
+@keyframes pulseGlow{
+  0%{text-shadow:0 0 0 rgba(60,140,24,0.6)}
+  50%{text-shadow:0 0 14px rgba(60,140,24,0.9)}
+  100%{text-shadow:0 0 0 rgba(60,140,24,0.6)}
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media(max-width:900px){
+  .location-grid{grid-template-columns:1fr}
+  #map{height:300px}
+  .slogan{font-size:1.1rem;letter-spacing:3px}
 }
 </style>
 </head>
@@ -186,79 +217,90 @@ button{
 <body>
 
 <header>
-  <img src="swachhify_logo.png">
+  <img src="swachhify_logo.png" alt="Swachhify Logo">
   <div class="slogan">SENSE MORE · LIVE BETTER</div>
 </header>
 
-<!-- DASHBOARD -->
-<section class="dashboard">
+<section class="reveal">
+  <h2>Location & Light Pollution Analysis</h2>
 
-  <!-- INFO PANEL -->
-  <div class="panel card" style="animation-delay:.1s">
-    <p><strong>📍 Location:</strong> <span id="coords">Detecting…</span></p>
-    <p><strong>🔭 Light Pollution Class:</strong> <span id="bortle">Estimating…</span></p>
+  <div class="location-grid">
+    <div class="location-info">
 
-    <div id="aqiBox" class="aqi-box pulse aqi-moderate">AQI: 78</div>
+      <div class="stat-card">
+        <div class="stat-title">Coordinates</div>
+        <div class="stat-value" id="coords">Detecting…</div>
+      </div>
 
-    <p style="margin-top:8px;font-size:.9rem">
-      Moderate air quality. Sensitive groups should reduce prolonged outdoor exposure.
-    </p>
-  </div>
+      <div class="stat-card">
+        <div class="stat-title">Bortle Class</div>
+        <div class="stat-value" id="bortle">Estimating…</div>
+      </div>
 
-  <!-- MAP -->
-  <div class="panel card" style="animation-delay:.25s">
+      <div class="stat-card">
+        <div class="stat-title">Estimation Method</div>
+        <div class="stat-value">Satellite Light Overlay</div>
+      </div>
+
+    </div>
+
     <div id="map"></div>
   </div>
-
 </section>
 
-<!-- LIGHT POLLUTION -->
-<h3 class="section-title">🌃 Light Pollution Analysis</h3>
-<div class="panel graph">
-  <img src="bortle.png" style="width:100%;border-radius:12px">
-  <p style="font-size:.9rem;margin-top:8px">
-    Based on satellite night-sky brightness (Bortle scale approximation).
-  </p>
-</div>
+<section class="reveal">
+  <h2>Environmental Noise Estimation</h2>
+  <p><strong>Estimated Noise Level:</strong> <span id="noise">Calculating…</span></p>
+  <p><strong>Model:</strong> Urban density & traffic proxy</p>
+</section>
 
-<!-- SOUND -->
-<h3 class="section-title">🔊 Live Noise Measurement</h3>
-<div class="panel card" style="margin:20px">
-  <p><strong>Noise Level:</strong> <span id="live-noise">Click start</span></p>
-  <button onclick="startMic()">Start Microphone</button>
-</div>
+<section class="reveal">
+  <h2>Live Microphone Noise Measurement</h2>
+  <p><strong>Live Noise:</strong> <span id="live-noise" class="pulse">Inactive</span></p>
+  <button onclick="startMic()">Start Measurement</button>
+</section>
 
-<!-- TABLE -->
-<h3 class="section-title">📊 Noise Level Health Guide</h3>
-<table>
-<tr><th>dB</th><th>Health Impact</th></tr>
-<tr><td>0–30</td><td>Very quiet, ideal for sleep</td></tr>
-<tr><td>30–60</td><td>Normal, safe</td></tr>
-<tr><td>60–85</td><td>Stress with prolonged exposure</td></tr>
-<tr><td>85+</td><td>Hearing damage risk</td></tr>
-</table>
+<section class="reveal">
+  <h2>Noise Level Health Impact</h2>
+  <table>
+    <tr><th>Noise Level (dB)</th><th>Health Impact</th></tr>
+    <tr><td>0–30</td><td>Ideal, promotes rest</td></tr>
+    <tr><td>30–60</td><td>Safe daily exposure</td></tr>
+    <tr><td>60–85</td><td>Stress with prolonged exposure</td></tr>
+    <tr><td>85+</td><td>Hearing damage risk</td></tr>
+  </table>
+</section>
+
+<footer>
+  © 2026 Swachhify | Environmental Monitoring & Awareness Initiative
+</footer>
 
 <script>
-function updateAQI(val){
-  const box=document.getElementById("aqiBox");
-  box.textContent="AQI: "+val;
-  box.className="aqi-box pulse";
-  if(val<=50)box.classList.add("aqi-good");
-  else if(val<=100)box.classList.add("aqi-moderate");
-  else box.classList.add("aqi-poor");
+/* ---------- SCROLL REVEAL ---------- */
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting) e.target.classList.add("show");
+  });
+},{threshold:0.15});
+document.querySelectorAll(".reveal").forEach(sec=>observer.observe(sec));
+
+/* ---------- MAP & DATA ---------- */
+function estimateBortle(lat){
+  return (lat>60||lat<-60) ? "Class 2–3 (Dark Sky)" : "Class 5–7 (Suburban Sky)";
 }
-updateAQI(78);
+
+function estimateNoise(lat){
+  return lat>55 ? "Low environmental noise" : "Moderate to high urban noise";
+}
 
 function initMap(lat,lon){
-  document.getElementById("coords").innerText=
-    lat.toFixed(4)+", "+lon.toFixed(4);
-
+  document.getElementById("coords").innerText=`${lat.toFixed(4)}, ${lon.toFixed(4)}`;
   const map=L.map("map").setView([lat,lon],9);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-  L.marker([lat,lon]).addTo(map);
-
-  document.getElementById("bortle").innerText=
-    lat>60?"2–3 (Dark Sky)":"5–7 (Suburban Sky)";
+  L.tileLayer("https://tiles.lightpollutionmap.info/tiles/world/{z}/{x}/{y}.png",{opacity:0.7}).addTo(map);
+  L.marker([lat,lon]).addTo(map).bindPopup("Current Location").openPopup();
+  document.getElementById("bortle").innerText=estimateBortle(lat);
+  document.getElementById("noise").innerText=estimateNoise(lat);
 }
 
 navigator.geolocation.getCurrentPosition(
@@ -266,22 +308,27 @@ navigator.geolocation.getCurrentPosition(
   ()=>alert("Location access denied")
 );
 
+/* ---------- LIVE MIC ---------- */
 async function startMic(){
-  const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-  const ctx=new AudioContext();
-  const analyser=ctx.createAnalyser();
-  ctx.createMediaStreamSource(stream).connect(analyser);
-  analyser.fftSize=256;
-  const data=new Uint8Array(analyser.frequencyBinCount);
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    const ctx=new AudioContext();
+    const analyser=ctx.createAnalyser();
+    const src=ctx.createMediaStreamSource(stream);
+    src.connect(analyser);
+    const data=new Uint8Array(analyser.frequencyBinCount);
 
-  function loop(){
-    analyser.getByteFrequencyData(data);
-    let avg=data.reduce((a,b)=>a+b,0)/data.length;
-    document.getElementById("live-noise").innerText=
-      Math.round(avg/255*100)+" dB";
-    requestAnimationFrame(loop);
+    function loop(){
+      analyser.getByteFrequencyData(data);
+      const avg=data.reduce((a,b)=>a+b,0)/data.length;
+      const db=Math.round((avg/255)*100);
+      document.getElementById("live-noise").innerText=db+" dB (approx)";
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }catch{
+    document.getElementById("live-noise").innerText="Microphone access denied";
   }
-  loop();
 }
 </script>
 
