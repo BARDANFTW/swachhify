@@ -331,6 +331,21 @@ async function startMic() {
     document.getElementById("live-noise").innerText = "Microphone access denied";
   }
 }
+  async function fetchLiveData() {
+  try {
+    const res = await fetch("/api/data");
+    const data = await res.json();
+
+    document.getElementById("aqi").innerText = data.aqi;
+    document.getElementById("noise").innerText = data.noise + " dB";
+    document.getElementById("ph").innerText = data.ph;
+  } catch (e) {
+    console.log("Data fetch failed");
+  }
+}
+
+setInterval(fetchLiveData, 5000);
+fetchLiveData();
 </script>
 
 
