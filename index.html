@@ -258,6 +258,14 @@
     }
   }
 </script>
+  <script>
+fetch("https://your-project.firebaseio.com/aqi.json")
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("aqi").innerText = data.aqi;
+  });
+</script>
+
 
 </body>
 </html>
