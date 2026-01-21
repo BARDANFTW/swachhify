@@ -1,204 +1,45 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Swachhify</title>
-  <link rel="icon" type="image/png" href="swachhify_logo.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      --main-bg: #B6D83D;
-      --accent: #3c8c18;
-      --dark: #1a1a1a;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: var(--main-bg);
-      color: var(--dark);
-      transition: 0.4s ease-in-out;
-    }
-
-    header {
-      background: var(--main-bg);
-      color: var(--dark);
-      padding: 20px;
-      text-align: center;
-      font-size: 1.8rem;
-      letter-spacing: 1px;
-      animation: fadeDown 0.8s ease;
-    }
-
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .slogan {
-      margin-top: 20px;
-      font-size: 28px;
-      font-weight: 600;
-      letter-spacing: 18px;
-      color: white;
-      animation: fadeDown 1s ease;
-    }
-
-    #main-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 20px;
-      gap: 20px;
-    }
-
-    #info-box {
-      flex: 1 1 300px;
-      padding: 15px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.6);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      backdrop-filter: blur(6px);
-      animation: fadeIn 1s ease;
-    }
-
-    #map {
-      flex: 2 1 500px;
-      height: 400px;
-      border-radius: 15px;
-      overflow: hidden;
-      animation: popIn 0.7s ease;
-    }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes popIn { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-    #bortle-chart {
-      width: 85%;
-      display: block;
-      margin: 20px auto;
-      border-radius: 10px;
-      animation: fadeIn 1.4s ease;
-    }
-
-    .section-title {
-      font-size: 1.6rem;
-      margin: 30px 0 10px 0;
-      color: var(--accent);
-      font-weight: bold;
-    }
-
-    #aqi-display {
-      font-weight: bold;
-      font-size: 1.2rem;
-      transition: 0.5s ease;
-    }
-  </style>
-</head>
-<body>
-
-<header>
-  <img src="swachhify_logo.png" alt="Swachhify Logo" style="height:150px; width:150px; animation: fadeDown 0.8s ease;">
-  <p class="slogan">SENSE MORE LIVE BETTER</p>
-</header>
-
-<div id="main-container">
-  <!-- Info Box -->
-  <div id="info-box">
-    <p>📍 <strong>Location:</strong> <span id="coords">Detecting…</span></p>
-    <p>🔭 <strong>Bortle Class:</strong> <span id="bortle">Estimating…</span></p>
-    <p>🌃 <strong>Air Quality:</strong> <span id="aqi-display">--</span></p>
-    <p>🌃 <strong>Method:</strong> Tile-based overlay estimation</p>
-  </div>
-
-  <!-- Map -->
-  <div id="map"></div>
-</div>
-
-<h3 class="section-title">📊 Light Level Visibility</h3>
-<img id="bortle-chart" src="bortle.png" alt="Bortle Scale Chart">
-<p style="text-align:left; margin-left:10px;">Source: https://www.handprint.com/ASTRO/bortle.html</p>
-
-<h3 class="section-title">🔊 Sound Pollution Estimate</h3>
-<div id="sound-info" style="padding:15px; margin:20px; border-radius:12px; background:rgba(255,255,255,0.6); box-shadow:0 4px 10px rgba(0,0,0,0.15); backdrop-filter:blur(6px);">
-  <p>🎧 <strong>Noise Level:</strong> <span id="noise">Calculating…</span></p>
-  <p>📡 <strong>Method:</strong> Urban density + traffic proxy estimation</p>
-</div>
+<section class="reveal">
+  <h2>Live Microphone Noise Measurement</h2>
+  <p><strong>Live Noise:</strong> <span id="live-noise" class="pulse">Inactive</span></p>
+  <button onclick="startMic()">Start Measurement</button>
+</section>
 
 <script>
-  // Bortle & Noise estimation
-  function estimateBortle(lat) {
-    if (lat > 60 || lat < -60) return "2–3 (Generally dark)";
-    return "5–7 (Suburban average)";
-  }
-  function estimateNoise(lat, lon) {
-    if (lat > 55) return "Low – Mostly natural environment";
-    return "Medium to High – Typical urban noise";
-  }
+async function startMic() {
+  try {
+    // Request microphone access
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    source.connect(analyser);
 
-  // Map and location
-  function initMap(lat, lon) {
-    document.getElementById("coords").innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
+    const dataArray = new Uint8Array(analyser.fftSize);
 
-    const map = L.map("map").setView([lat, lon], 9);
+    function measure() {
+      // Get audio data
+      analyser.getByteTimeDomainData(dataArray);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "© OpenStreetMap"
-    }).addTo(map);
+      // Calculate RMS (Root Mean Square) to estimate volume
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        const sample = (dataArray[i] - 128) / 128; // normalize to [-1,1]
+        sum += sample * sample;
+      }
+      const rms = Math.sqrt(sum / dataArray.length);
+      const db = Math.round(20 * Math.log10(rms + 0.00001)); // add small value to avoid log(0)
 
-    L.tileLayer("https://tiles.lightpollutionmap.info/tiles/world/{z}/{x}/{y}.png", {
-      opacity: 0.75,
-      attribution: "Light Pollution Map"
-    }).addTo(map);
+      // Display dB on page
+      document.getElementById("live-noise").innerText = `${db} dB (approx)`;
 
-    L.marker([lat, lon]).addTo(map)
-      .bindPopup("You are here 🌎")
-      .openPopup();
-
-    document.getElementById("bortle").innerText = estimateBortle(lat);
-    document.getElementById("noise").innerText = estimateNoise(lat, lon);
-  }
-
-  function getLocation() {
-    if (!navigator.geolocation) {
-      alert("Geolocation not supported");
-      return;
+      requestAnimationFrame(measure);
     }
-    navigator.geolocation.getCurrentPosition(
-      pos => initMap(pos.coords.latitude, pos.coords.longitude),
-      () => alert("Location access denied")
-    );
+
+    measure();
+  } catch (err) {
+    document.getElementById("live-noise").innerText = "Microphone access denied";
+    console.error(err);
   }
-  getLocation();
-
-  // Live AQI fetch from API
-  async function fetchAQI() {
-    try {
-      const res = await fetch("/api/data"); // replace with your API endpoint
-      const data = await res.json();
-
-      const aqiEl = document.getElementById("aqi-display");
-      aqiEl.innerText = data.aqi;
-
-      // Color coding
-      if (data.aqi <= 700) aqiEl.style.color = "green";
-      else if (data.aqi <= 1500) aqiEl.style.color = "orange";
-      else aqiEl.style.color = "red";
-    } catch (err) {
-      console.error("Failed to fetch AQI:", err);
-    }
-  }
-  setInterval(fetchAQI, 5000);
-  fetchAQI();
+}
 </script>
-
-</body>
-</html>
