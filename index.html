@@ -7,7 +7,6 @@
   <link rel="icon" type="image/png" href="swachhify_logo.png">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -25,8 +24,7 @@
     * { box-sizing: border-box; }
 
     body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: 'Poppins', sans-serif;
       background: var(--primary);
       color: var(--dark);
@@ -165,10 +163,11 @@
     </div>
 
     <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+    
     <p style="margin:0 0 5px 0; font-weight:500;">Noise Level</p>
     <div style="display:flex; align-items:baseline; justify-content:space-between;">
       <span id="live-noise" class="sensor-value" style="font-size:1.6rem;">Inactive</span>
-      <span class="sensor-sub">Mic Monitor</span>
+      <span class="sensor-sub">RMS Mic Monitor</span>
     </div>
     <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
   </div>
@@ -276,14 +275,14 @@
   setInterval(fetchAQI, 3500);
 
   // ==========================
-  // 3. FIXED MICROPHONE LOGIC
+  // 3. FIXED MICROPHONE LOGIC (RMS + Buzzer)
   // ==========================
   let audioCtx, analyser, dataArray, isMicRunning = false;
 
   async function toggleMic() {
     const btn = document.getElementById("btn-mic");
     
-    // Stop if running
+    // If running, stop it (reload is cleanest for audio streams)
     if (isMicRunning) { location.reload(); return; }
 
     try {
@@ -292,11 +291,9 @@
       const src = audioCtx.createMediaStreamSource(stream);
       analyser = audioCtx.createAnalyser();
       
-      // We use 512 for better resolution
+      // Use Time Domain for true volume (RMS)
       analyser.fftSize = 512;
       src.connect(analyser);
-      
-      // Time Domain gives us the Waveform (amplitude) which is better for volume
       dataArray = new Uint8Array(analyser.frequencyBinCount);
 
       isMicRunning = true;
@@ -305,7 +302,7 @@
       
       loopMic();
     } catch (e) {
-      alert("Microphone access denied. Check permissions.");
+      alert("Microphone access denied. Please allow permission.");
     }
   }
 
@@ -313,37 +310,63 @@
     if (!isMicRunning) return;
     requestAnimationFrame(loopMic);
 
-    // Get waveform data (0-255, where 128 is silence)
+    // Get waveform (Amplitude)
     analyser.getByteTimeDomainData(dataArray);
 
     let sumSquares = 0;
     for (let i = 0; i < dataArray.length; i++) {
-      // Normalize 0-255 to -1 to 1 float range
-      let normalized = (dataArray[i] - 128) / 128;
+      let normalized = (dataArray[i] - 128) / 128; // Center at 0
       sumSquares += normalized * normalized;
     }
     
-    // Calculate RMS (Root Mean Square)
+    // RMS Calculation
     let rms = Math.sqrt(sumSquares / dataArray.length);
 
-    // Convert RMS to Decibels (Logarithmic)
-    // We add an offset (approx 90-100) to mimic SPL (Sound Pressure Level)
-    // 0 RMS = -Infinity dB, so we handle that safely
+    // Logarithmic conversion to dB
+    // +100 is an arbitrary offset to simulate SPL (Sound Pressure Level)
     let db = 0;
     if (rms > 0) {
-      db = 20 * Math.log10(rms) + 95; // +95 is calibration offset
+      db = Math.round(20 * Math.log10(rms) + 100);
     }
     
-    // Clean up the value
-    db = Math.max(0, Math.round(db)); // Prevent negative numbers
+    // Limit lower bound to 0
+    db = Math.max(0, db);
 
     const display = document.getElementById("live-noise");
     display.innerText = db + " dB";
 
-    // Visual Color Feedback
+    // Colors
     if (db < 50) display.style.color = "green";
-    else if (db < 75) display.style.color = "#FF9800"; // Orange
+    else if (db < 80) display.style.color = "#FF9800";
     else display.style.color = "red";
+
+    // --- BUZZER FEATURE (From your snippet) ---
+    if (db > 100) {
+      playBuzzer();
+    }
+  }
+
+  // Helper: Prevents buzzer from overlapping too much
+  let isBuzzing = false;
+  function playBuzzer() {
+    if (isBuzzing) return;
+    isBuzzing = true;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(600, audioCtx.currentTime); // 600Hz beep
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.start();
+    // Stop after 200ms
+    setTimeout(() => {
+      osc.stop();
+      isBuzzing = false;
+    }, 200);
   }
 
 </script>
