@@ -16,7 +16,7 @@
       --main-bg: #B6D83D; 
       --accent: #3c8c18;
       --dark: #1a1a1a;
-      --card-bg: rgba(255, 255, 255, 0.9);
+      --card-bg: rgba(255, 255, 255, 0.92);
     }
 
     body {
@@ -26,74 +26,78 @@
       color: var(--dark);
     }
 
-    /* HEADER */
+    /* HEADER (Slightly reduced padding) */
     header {
       background: var(--main-bg);
-      padding: 20px;
+      padding: 15px;
       text-align: center;
       animation: fadeDown 0.8s ease;
     }
-    header img { height: 150px; width: 150px; display: block; margin: 0 auto; }
+    header img { height: 120px; width: 120px; display: block; margin: 0 auto; }
     .slogan {
-      margin-top: 10px;
-      font-size: 28px;
+      margin-top: 5px;
+      font-size: 22px;
       font-weight: 600;
-      letter-spacing: 18px; 
+      letter-spacing: 12px; 
       color: white;
       text-transform: uppercase;
     }
 
-    /* DASHBOARD */
+    /* DASHBOARD (Compressed) */
     .dashboard {
       display: grid;
-      /* Responsive Columns: Auto-fit ensures it looks good on mobile and laptop */
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 25px;
-      padding: 20px;
+      /* Auto-fit columns */
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      /* Tighter gaps and padding */
+      gap: 15px;
+      padding: 15px;
       max-width: 1200px;
       margin: 0 auto;
     }
 
     .card {
       background: var(--card-bg);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      border: 2px solid rgba(0,0,0,0.05);
+      /* Tighter internal padding */
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.05);
       animation: fadeIn 1s ease;
     }
 
     .section-title {
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       color: var(--accent);
       font-weight: bold;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
       border-bottom: 2px solid var(--accent);
-      padding-bottom: 5px;
+      padding-bottom: 3px;
     }
 
-    /* MAP SETTINGS */
+    /* MAP SETTINGS (Slightly shorter) */
     #map {
-      height: 350px;
+      height: 300px;
       width: 100%;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
       border: 2px solid white;
       background: #000;
     }
 
-    /* TABLES */
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 10px; background: rgba(255,255,255,0.5); }
-    th, td { padding: 10px; border: 1px solid #333; text-align: left; }
+    /* TABLES (Compressed) */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 5px; background: rgba(255,255,255,0.5); }
+    th, td { padding: 8px; border: 1px solid #ccc; text-align: left; }
     th { background: var(--accent); color: white; }
 
     /* BUTTONS */
     .mic-btn {
-      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      width: 100%; padding: 10px; border: none; border-radius: 6px;
       background: var(--accent); color: white; font-family: 'Poppins', sans-serif;
-      font-weight: 600; cursor: pointer; font-size: 1rem;
+      font-weight: 600; cursor: pointer; font-size: 0.9rem;
     }
     .mic-btn:hover { background: #2a6310; }
+    
+    hr { margin: 10px 0; border: 0; border-top: 1px solid #ddd; }
 
     /* ANIMATIONS */
     @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -110,53 +114,46 @@
 
 <div class="dashboard">
 
-  <div class="card" style="grid-column: span 1; grid-row: span 2;">
+  <div class="card" style="grid-row: span 2;">
     <div class="section-title">📍 Location Status</div>
-    <p><strong>Coords:</strong> <span id="coords">Detecting...</span></p>
+    <p style="font-size: 0.9rem; margin-bottom: 5px;"><strong>Coords:</strong> <span id="coords">Detecting...</span></p>
     <div id="map"></div>
-    <p style="font-size:0.8rem; margin-top:5px; color:#555;">Layer: NASA VIIRS Night Lights</p>
+    <p style="font-size:0.75rem; margin-top:5px; color:#555;">Layer: NASA VIIRS Night Lights</p>
   </div>
 
   <div class="card">
-    <div class="section-title">🔭 Light Pollution</div>
+    <div class="section-title">🔭 Light Pollution Estimates</div>
     <p><strong>Bortle Scale:</strong> <span id="bortle">Calculating...</span></p>
     <p><strong>Sky Condition:</strong> <span id="sky-quality">--</span></p>
-    
-    <center>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Bortle_scale.svg/1200px-Bortle_scale.svg.png" 
-           alt="Bortle Scale" 
-           style="width:100%; max-height:150px; object-fit:contain; border-radius:8px; margin-top:10px;">
-    </center>
+    <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">*Based on geographic location data.</p>
   </div>
 
   <div class="card">
     <div class="section-title">📡 Real-Time Sensors</div>
     
-    <div style="margin-bottom: 20px;">
-      <p style="margin-bottom:5px;"><strong>🌫️ Air Quality (AQI)</strong></p>
+    <div style="margin-bottom: 15px;">
+      <p style="margin-bottom:2px; font-size:0.9rem;"><strong>🌫️ Air Quality (AQI)</strong></p>
       <div style="display:flex; justify-content:space-between; align-items:center;">
-        <span id="aqi-display" style="font-size:1.8rem; font-weight:bold;">--</span>
-        <span style="font-size:0.8rem; color:#555;">(Source: ESP32)</span>
+        <span id="aqi-display" style="font-size:1.6rem; font-weight:bold;">--</span>
+        <span style="font-size:0.75rem; color:#555;">(Source: ESP32)</span>
       </div>
     </div>
 
-    <hr style="border:0; border-top:1px solid #ccc; margin:15px 0;">
+    <hr>
 
-    <p style="margin-bottom:5px;"><strong>🎤 Noise Monitor</strong></p>
-    <p>Level: <span id="live-noise" style="font-weight:bold;">Ready</span></p>
+    <p style="margin-bottom:2px; font-size:0.9rem;"><strong>🎤 Noise Monitor</strong></p>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+       <span id="live-noise" style="font-size:1.2rem; font-weight:bold;">Ready</span>
+    </div>
     <button class="mic-btn" id="btn-mic" onclick="toggleMic()">Start Microphone</button>
   </div>
 
-</div>
-
-<div class="dashboard">
-  
   <div class="card">
     <div class="section-title">📊 Noise Health Guide</div>
     <table>
       <tr><th>dB Level</th><th>Effect</th></tr>
       <tr><td>0–30</td><td>Very quiet</td></tr>
-      <tr><td>30–60</td><td>Normal / Safe</td></tr>
+      <tr><td>30–60</td><td>Safe</td></tr>
       <tr><td>60–85</td><td>Annoying</td></tr>
       <tr style="background:#ffcccb"><td>85+</td><td>Harmful</td></tr>
     </table>
@@ -180,47 +177,29 @@
   // ==========================
   function initMap(lat, lon) {
     document.getElementById("coords").innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-    
     if (window.mapInstance) { window.mapInstance.remove(); }
-
     window.mapInstance = L.map("map").setView([lat, lon], 7);
 
-    // Dark Base Map (Looks cool with night theme)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      maxZoom: 19
+      attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19
     }).addTo(window.mapInstance);
 
-    // NASA Night Lights Overlay
     L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.jpg', {
       bounds: [[-85.0511287776, -179.999996], [85.0511287776, 179.999996]],
-      minZoom: 1, maxZoom: 8, format: 'image/jpg',
-      time: '', tilematrixset: 'GoogleMapsCompatible_Level', opacity: 0.6,
-      attribution: 'NASA GIBS'
+      minZoom: 1, maxZoom: 8, format: 'image/jpg', time: '', tilematrixset: 'GoogleMapsCompatible_Level', opacity: 0.6, attribution: 'NASA GIBS'
     }).addTo(window.mapInstance);
 
     L.marker([lat, lon]).addTo(window.mapInstance).bindPopup("Swachhify Location").openPopup();
-
-    // Update Estimates
     updateEstimates(lat);
   }
 
   function updateEstimates(lat) {
-    // Rough estimate logic based on latitude (Equator vs Poles)
-    let bortleClass = "Class 4 (Rural)";
-    let desc = "Visible Milky Way";
-
-    // Near Kathmandu/Dense Areas (Simplified logic)
-    if (lat > 20 && lat < 35) {
-      bortleClass = "Class 7 (Suburban/Urban)";
-      desc = "Bright Sky, Few Stars";
-    }
-
+    let bortleClass = "Class 4 (Rural)"; let desc = "Visible Milky Way";
+    if (lat > 20 && lat < 35) { bortleClass = "Class 7 (Urban)"; desc = "Bright Sky, Few Stars"; }
     document.getElementById("bortle").innerText = bortleClass;
     document.getElementById("sky-quality").innerText = desc;
   }
 
-  // Init Location
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => initMap(pos.coords.latitude, pos.coords.longitude),
@@ -241,7 +220,6 @@
       const data = await res.json();
       updateAQIDisplay(data.aqi);
     } catch (e) {
-      // Simulate if ESP32 disconnected
       updateAQIDisplay(Math.floor(Math.random() * (300 - 50) + 50));
     }
   }
@@ -297,7 +275,6 @@
     else if(db < 80) el.style.color = "orange";
     else el.style.color = "red";
   }
-
 </script>
 </body>
 </html>
