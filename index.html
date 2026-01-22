@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Swachhify - Environment Station</title>
+  <title>Swachhify - RealTime Monitor</title>
   
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+  <link rel="icon" type="image/png" href="swachhify_logo.png">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -16,24 +16,15 @@
     * { box-sizing: border-box; }
     body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: var(--primary); color: var(--dark); overflow-x: hidden; }
 
-    /* Header & Logo Fixes */
+    /* Header */
     header { padding: 25px 15px; text-align: center; animation: slideDown 0.8s ease-out; }
-    
-    /* FIX 2: Bigger Logo */
     header img { 
-      height: 160px; width: 160px; /* Increased from 120px */
+      height: 160px; width: 160px; 
       display: block; margin: 0 auto 15px auto; 
       animation: float 6s infinite; 
       filter: drop-shadow(0 5px 15px rgba(0,0,0,0.1));
     }
-    
     .slogan { font-weight: 700; color: white; text-transform: uppercase; margin: 0; opacity: 0; animation: fadeIn 1s ease forwards 0.5s; letter-spacing: 12px; font-size: 22px; }
-
-    /* Mobile Adjustments for Logo */
-    @media (max-width: 768px) { 
-        header img { height: 130px; width: 130px; } /* Increased from 100px */
-        .slogan { font-size: 16px; letter-spacing: 4px; } 
-    }
 
     /* Dashboard Layout */
     .dashboard { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; gap: 20px; }
@@ -54,6 +45,11 @@
     /* Card Styling */
     .card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); animation: fadeInUp 0.6s ease-out forwards; position: relative; }
     .section-title { font-size: 1.1rem; color: var(--accent); font-weight: 700; text-transform: uppercase; border-left: 4px solid var(--accent); padding-left: 10px; margin-bottom: 15px; }
+
+    /* Connection Panel */
+    .conn-panel { background: #333; color: white; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+    .conn-input { padding: 8px; border-radius: 4px; border: none; width: 60%; margin-right: 5px; }
+    .conn-btn { padding: 8px 15px; background: var(--primary); border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
     /* Map */
     #map { width: 100%; height: 350px; background: #000; border-radius: 12px; position: relative; z-index: 1; }
@@ -76,7 +72,6 @@
     .card:nth-child(1) { animation-delay: 0.1s; }
     .card:nth-child(2) { animation-delay: 0.2s; }
     .card:nth-child(3) { animation-delay: 0.3s; }
-    .card:nth-child(4) { animation-delay: 0.4s; }
   </style>
 </head>
 <body>
@@ -87,6 +82,16 @@
 </header>
 
 <div class="dashboard">
+
+  <div class="card col-span-2">
+    <div class="section-title">🔌 Hardware Connection</div>
+    <div class="conn-panel">
+      <p style="margin: 0 0 10px 0; font-size: 0.9rem;">Enter your ESP32 IP Address to sync with LCD:</p>
+      <input type="text" id="esp-ip" class="conn-input" placeholder="e.g. 192.168.1.15">
+      <button class="conn-btn" onclick="startRealTimeConnection()">Connect</button>
+      <div id="conn-status" style="margin-top:5px; font-size:0.8rem; color:#ccc;">Status: Disconnected</div>
+    </div>
+  </div>
 
   <div class="card col-span-2 row-span-2">
     <div class="section-title">📍 Live Location</div>
@@ -100,26 +105,25 @@
   </div>
 
   <div class="card">
-    <div class="section-title">📡 ESP32 Sensor Hub</div>
+    <div class="section-title">📡 Live Sensor Hub</div>
     
     <div style="margin-bottom:5px; display:flex; justify-content:space-between;">
       <strong>Air Quality (AQI)</strong>
-      <span style="font-size:0.75rem; color:#666;">ID: ESP-8266-A4</span>
+      <span style="font-size:0.75rem; color:#666;">Hardware Source</span>
     </div>
     
     <div style="display:flex; justify-content:space-between; align-items:baseline;">
       <span id="aqi-display" class="sensor-value">--</span>
       <div style="text-align:right;">
-        <span style="display:block; color:green; font-size:0.8rem; font-weight:600;">
-          <span style="display:inline-block; width:8px; height:8px; background:green; border-radius:50%; animation: blink 1s infinite;"></span> 
-          Live
+        <span id="status-indicator" style="display:block; color:gray; font-size:0.8rem; font-weight:600;">
+          <span id="status-dot" style="display:inline-block; width:8px; height:8px; background:gray; border-radius:50%;"></span> 
+          Offline
         </span>
-        <span id="last-sync" style="font-size:0.7rem; color:#888;">Syncing...</span>
       </div>
     </div>
 
     <div style="height:8px; background:#eee; width:100%; border-radius:4px; margin-top:5px; overflow:hidden;">
-      <div id="aqi-bar" style="width:0%; height:100%; background:green; transition:width 1s linear, background-color 1s;"></div>
+      <div id="aqi-bar" style="width:0%; height:100%; background:gray; transition:width 1s linear, background-color 1s;"></div>
     </div>
     
     <hr style="margin:20px 0; border-top:1px solid #eee;">
@@ -158,14 +162,10 @@
   <div class="card col-span-2">
     <div class="section-title">📈 History (1hr)</div>
     <div id="chart-bars" style="display:flex; align-items:flex-end; height:100px; gap:8px; padding-top:20px;"></div>
-    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px;">
-      <span>-60 mins</span> <span>Now</span>
-    </div>
   </div>
 
   <div class="card">
     <div class="section-title">📸 Report Incident</div>
-    <p style="font-size:0.85rem; color:#666; margin-bottom:15px;">Spot pollution? Snap a photo.</p>
     <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="alert('Report Uploaded to Swachhify Cloud!')">
     <button onclick="document.getElementById('cameraInput').click()" 
       style="background:#333; color:white; border:none; padding:12px; border-radius:50px; font-weight:600; cursor:pointer; width:100%;">
@@ -179,7 +179,83 @@
 
 <script>
   // ==========================
-  // 1. LOCATION LOGIC
+  // 1. REAL TIME SENSOR FETCHING
+  // ==========================
+  let fetchInterval;
+  
+  function startRealTimeConnection() {
+    const ip = document.getElementById('esp-ip').value;
+    const statusDiv = document.getElementById('conn-status');
+
+    if (!ip) {
+      alert("Please enter the IP address displayed on your Serial Monitor (e.g., 192.168.1.5)");
+      return;
+    }
+
+    statusDiv.innerHTML = "Status: <span style='color:orange'>Connecting to " + ip + "...</span>";
+    
+    // Clear old interval if exists
+    if(fetchInterval) clearInterval(fetchInterval);
+
+    // Start Fetch Loop
+    fetchInterval = setInterval(() => fetchSensorData(ip), 2000);
+    fetchSensorData(ip); // Run immediately
+  }
+
+  async function fetchSensorData(ip) {
+    const statusDiv = document.getElementById('conn-status');
+    const indicator = document.getElementById('status-indicator');
+    const dot = document.getElementById('status-dot');
+
+    try {
+      // Trying to fetch http://<ESP-IP>/data
+      // NOTE: Ensure your ESP32 adds header: "Access-Control-Allow-Origin: *"
+      const response = await fetch(`http://${ip}/data`, { signal: AbortSignal.timeout(1500) });
+      
+      if (!response.ok) throw new Error("Network response was not ok");
+      
+      const data = await response.json();
+      
+      // Connection Success
+      statusDiv.innerHTML = "Status: <span style='color:#B6D83D'>Connected (Receiving Data)</span>";
+      indicator.style.color = "green";
+      indicator.innerHTML = "● Online";
+      dot.style.background = "green";
+      dot.style.animation = "blink 1s infinite";
+
+      // Update UI with REAL Data
+      updateAQIDisplay(data.aqi); // Assumes JSON is { "aqi": 120 }
+
+    } catch (error) {
+      console.log(error);
+      statusDiv.innerHTML = "Status: <span style='color:red'>Connection Failed (Check IP/CORS)</span>";
+      indicator.style.color = "red";
+      indicator.innerHTML = "● Offline";
+      dot.style.background = "red";
+      dot.style.animation = "none";
+    }
+  }
+
+  function updateAQIDisplay(val) {
+    const display = document.getElementById("aqi-display");
+    const bar = document.getElementById("aqi-bar");
+
+    // Ensure val is a number
+    val = parseInt(val) || 0;
+    display.innerText = val;
+
+    let color = "#4CAF50"; // Green
+    if(val > 50) color = "#FFC107"; // Yellow
+    if(val > 100) color = "#FF9800"; // Orange
+    if(val > 150) color = "#F44336"; // Red
+    
+    display.style.color = color;
+    bar.style.backgroundColor = color;
+    bar.style.width = Math.min((val / 300) * 100, 100) + "%";
+  }
+
+  // ==========================
+  // 2. LOCATION LOGIC (Standard)
   // ==========================
   function attemptLocationStrategy() {
     const status = document.getElementById("coords-display");
@@ -202,7 +278,6 @@
       else throw new Error("IP Fail");
     } catch (e) {
       loadMap(27.6899, 85.2986, "Default (GPS Failed)");
-      alert("Could not detect location. Showing Default Map.");
     }
   }
 
@@ -221,13 +296,12 @@
       window.mapInstance.setView([lat, lon], 13);
       window.marker.setLatLng([lat, lon]);
     }
-
     fetchWeather(lat, lon);
     updateEstimates(lat);
   }
 
   // ==========================
-  // 2. DATA & ESTIMATES
+  // 3. WEATHER & MIC
   // ==========================
   async function fetchWeather(lat, lon) {
     try {
@@ -245,58 +319,6 @@
     if (Math.abs(lat) > 20 && Math.abs(lat) < 50) { bortle = "Class 7 (Urban)"; desc = "Bright Sky"; }
     document.getElementById("bortle").innerText = bortle;
     document.getElementById("sky-quality").innerText = desc;
-  }
-
-  // ==========================
-  // 3. FIX: ROBUST ESP32 SENSOR SIMULATION
-  // ==========================
-  let currentAQI = 45; // Start value
-
-  function simulateESP32() {
-    // 1. Simulate data drift (Realistic random walk)
-    const change = Math.floor(Math.random() * 10) - 4; // -4 to +5 change
-    currentAQI += change;
-    
-    // Bounds check
-    if(currentAQI < 20) currentAQI = 25;
-    if(currentAQI > 300) currentAQI = 290;
-
-    // 2. Update DOM
-    const display = document.getElementById("aqi-display");
-    const bar = document.getElementById("aqi-bar");
-    
-    display.innerText = currentAQI;
-
-    // 3. Color Logic
-    let color = "#4CAF50"; // Green
-    if(currentAQI > 50) color = "#FFC107"; // Yellow
-    if(currentAQI > 100) color = "#FF9800"; // Orange
-    if(currentAQI > 150) color = "#F44336"; // Red
-    
-    display.style.color = color;
-    bar.style.backgroundColor = color;
-    bar.style.width = Math.min((currentAQI / 200) * 100, 100) + "%";
-
-    // 4. Update Sync Timer
-    const now = new Date();
-    document.getElementById("last-sync").innerText = "Last sync: " + now.toLocaleTimeString();
-  }
-
-  // Run simulation every 2 seconds (looks very active)
-  setInterval(simulateESP32, 2000);
-  simulateESP32(); // Run once immediately
-
-  // ==========================
-  // 4. CHART & MIC
-  // ==========================
-  const chartContainer = document.getElementById("chart-bars");
-  for(let i=0; i<15; i++) {
-    const bar = document.createElement("div");
-    bar.style.flex = "1";
-    bar.style.background = i === 14 ? "#B6D83D" : "#ddd";
-    bar.style.height = Math.floor(Math.random() * (100 - 20) + 20) + "%";
-    bar.style.borderRadius = "4px 4px 0 0";
-    chartContainer.appendChild(bar);
   }
 
   let audioCtx, analyser, dataArray, isMicRunning = false;
@@ -329,9 +351,18 @@
     el.style.color = db > 75 ? "red" : "#333";
   }
 
-  // START APP
-  attemptLocationStrategy();
+  // Init Charts
+  const chartContainer = document.getElementById("chart-bars");
+  for(let i=0; i<15; i++) {
+    const bar = document.createElement("div");
+    bar.style.flex = "1";
+    bar.style.background = "#ddd";
+    bar.style.height = "20%";
+    bar.style.borderRadius = "4px 4px 0 0";
+    chartContainer.appendChild(bar);
+  }
 
+  attemptLocationStrategy();
 </script>
 </body>
 </html>
