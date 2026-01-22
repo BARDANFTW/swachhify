@@ -16,7 +16,7 @@
       --main-bg: #B6D83D; 
       --accent: #3c8c18;
       --dark: #1a1a1a;
-      --card-bg: rgba(255, 255, 255, 0.92);
+      --card-bg: rgba(255, 255, 255, 0.95);
     }
 
     body {
@@ -24,16 +24,27 @@
       font-family: 'Poppins', sans-serif;
       background: var(--main-bg);
       color: var(--dark);
+      overflow-x: hidden; /* Prevents scrollbar flickering during anims */
     }
 
-    /* HEADER (Slightly reduced padding) */
+    /* HEADER ANIMATIONS */
     header {
       background: var(--main-bg);
       padding: 15px;
       text-align: center;
-      animation: fadeDown 0.8s ease;
+      /* Slide down entrance */
+      animation: slideDown 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    header img { height: 120px; width: 120px; display: block; margin: 0 auto; }
+
+    header img { 
+      height: 120px; 
+      width: 120px; 
+      display: block; 
+      margin: 0 auto;
+      /* Gentle floating effect */
+      animation: float 6s ease-in-out infinite; 
+    }
+
     .slogan {
       margin-top: 5px;
       font-size: 22px;
@@ -41,29 +52,50 @@
       letter-spacing: 12px; 
       color: white;
       text-transform: uppercase;
+      opacity: 0;
+      /* Text fades in after logo */
+      animation: fadeIn 1s ease forwards 0.5s; 
     }
 
-    /* DASHBOARD (Compressed) */
+    /* DASHBOARD LAYOUT */
     .dashboard {
       display: grid;
-      /* Auto-fit columns */
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      /* Tighter gaps and padding */
       gap: 15px;
       padding: 15px;
       max-width: 1200px;
       margin: 0 auto;
     }
 
+    /* CARD ANIMATIONS */
     .card {
       background: var(--card-bg);
-      /* Tighter internal padding */
       padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
       border: 1px solid rgba(0,0,0,0.05);
-      animation: fadeIn 1s ease;
+      
+      /* Smooth transition for hover effects */
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      
+      /* Initial state for entrance animation */
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.6s ease-out forwards;
     }
+
+    /* Hover Effect: Lift up */
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    /* Staggered Entrance (Cards load one by one) */
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
 
     .section-title {
       font-size: 1.2rem;
@@ -74,7 +106,7 @@
       padding-bottom: 3px;
     }
 
-    /* MAP SETTINGS (Slightly shorter) */
+    /* MAP */
     #map {
       height: 300px;
       width: 100%;
@@ -82,26 +114,64 @@
       overflow: hidden;
       border: 2px solid white;
       background: #000;
+      transition: opacity 0.5s ease;
     }
 
-    /* TABLES (Compressed) */
+    /* TABLES */
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 5px; background: rgba(255,255,255,0.5); }
-    th, td { padding: 8px; border: 1px solid #ccc; text-align: left; }
+    th, td { padding: 8px; border: 1px solid #ccc; text-align: left; transition: background 0.3s; }
     th { background: var(--accent); color: white; }
+    tr:hover { background: rgba(182, 216, 61, 0.2); } /* Table row highlight */
 
     /* BUTTONS */
     .mic-btn {
       width: 100%; padding: 10px; border: none; border-radius: 6px;
       background: var(--accent); color: white; font-family: 'Poppins', sans-serif;
       font-weight: 600; cursor: pointer; font-size: 0.9rem;
+      transition: all 0.3s ease;
     }
-    .mic-btn:hover { background: #2a6310; }
-    
+    .mic-btn:hover { background: #2a6310; transform: scale(1.02); }
+    .mic-btn:active { transform: scale(0.98); }
+
+    /* Class added via JS when mic is on */
+    .pulsing {
+      background: #d32f2f !important;
+      animation: pulse 1.5s infinite;
+    }
+
     hr { margin: 10px 0; border: 0; border-top: 1px solid #ddd; }
 
-    /* ANIMATIONS */
-    @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    /* DATA VALUES */
+    #aqi-display, #live-noise {
+      transition: color 0.5s ease; /* Smooth color change */
+    }
+
+    /* --- KEYFRAMES --- */
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(211, 47, 47, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
+    }
 
   </style>
 </head>
@@ -173,7 +243,7 @@
 
 <script>
   // ==========================
-  // 1. MAP LOGIC (NASA Night Lights)
+  // 1. MAP LOGIC 
   // ==========================
   function initMap(lat, lon) {
     document.getElementById("coords").innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
@@ -181,7 +251,7 @@
     window.mapInstance = L.map("map").setView([lat, lon], 7);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO', maxZoom: 19
+      attribution: '&copy; CARTO', maxZoom: 19
     }).addTo(window.mapInstance);
 
     L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.jpg', {
@@ -209,7 +279,7 @@
 
 
   // ==========================
-  // 2. AQI LOGIC (Demo/Live)
+  // 2. AQI LOGIC
   // ==========================
   async function fetchAQI() {
     try {
@@ -235,13 +305,17 @@
 
 
   // ==========================
-  // 3. MICROPHONE LOGIC
+  // 3. MICROPHONE LOGIC (With Animation)
   // ==========================
   let audioCtx, analyser, dataArray, isRunning = false;
 
   async function toggleMic() {
     const btn = document.getElementById("btn-mic");
-    if (isRunning) { location.reload(); return; }
+    
+    if (isRunning) { 
+      location.reload(); 
+      return; 
+    }
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -254,7 +328,8 @@
 
       isRunning = true;
       btn.innerText = "Stop Monitor";
-      btn.style.background = "#d32f2f";
+      btn.classList.add("pulsing"); // ADD PULSE ANIMATION
+      
       loopMic();
     } catch (e) { alert("Mic Error: " + e); }
   }
