@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
   <meta charset="UTF-8">
   <title>Swachhify</title>
   <link rel="icon" type="image/png" href="swachhify_logo.png">
@@ -10,12 +8,9 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
-
   <style>
     :root {
-      --main-bg: #B6D83D;
+      --main-bg: #B6D83D; /* from logo background */
       --accent: #3c8c18;
       --dark: #1a1a1a;
     }
@@ -43,26 +38,9 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .slogan {
-      margin-top: 20px;
-      font-size: 28px;
-      font-weight: 600;
-      letter-spacing: 18px;
-      color: white;
-      animation: fadeDown 1s ease;
-    }
-
-    #main-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 20px;
-      gap: 20px;
-    }
-
-    #info-box {
-      flex: 1 1 300px;
+    #info, #sound-info {
       padding: 15px;
+      margin: 20px;
       border-radius: 12px;
       background: rgba(255,255,255,0.6);
       box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -70,81 +48,213 @@
       animation: fadeIn 1s ease;
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     #map {
-      flex: 2 1 500px;
-      height: 400px;
+      height: 60vh;
       border-radius: 15px;
       overflow: hidden;
+      margin: 20px;
       animation: popIn 0.7s ease;
     }
 
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes popIn { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes popIn {
+      0% { transform: scale(0.95); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
 
-    #bortle-chart {
+    img#bortle-chart {
       width: 85%;
       display: block;
-      margin: 20px auto;
+      margin: 40px auto;
       border-radius: 10px;
       animation: fadeIn 1.4s ease;
     }
 
     .section-title {
       font-size: 1.6rem;
-      margin: 30px 0 10px 0;
+      margin-left: 20px;
       color: var(--accent);
       font-weight: bold;
     }
 
-    #aqi-display {
-      font-weight: bold;
-      font-size: 1.2rem;
-      transition: 0.5s ease;
-    }
+.slogan {
+    margin-top: 50px;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 18px;
+    color: white;
+  }
+
   </style>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&amp;family=Poppins:wght@300;500;700&amp;display=swap" rel="stylesheet">
 </head>
 <body>
 
 <header>
-  <img src="swachhify_logo.png" alt="Swachhify Logo" style="height:150px; width:150px; animation: fadeDown 0.8s ease;">
-  <p class="slogan">SENSE MORE LIVE BETTER</p>
+  <img src="swachhify_logo.png" alt="Swachhify Logo" style=" animation: fadeDown 0.8s ease; height=" 150px";="" width="150px" ;"="">
+  <p class="slogan" style=" animation: fadeDown 0.8s ease; height=" 150px";="" width="150px" ;"="">SENSE MORE LIVE BETTER</p>
 </header>
 
-<div id="main-container">
-  <!-- Info Box -->
-  <div id="info-box">
-    <p>📍 <strong>Location:</strong> <span id="coords">Detecting…</span></p>
-    <p>🔭 <strong>Bortle Class:</strong> <span id="bortle">Estimating…</span></p>
-    <p>🌃 <strong>Air Quality:</strong> <span id="aqi-display">--</span></p>
-    <p>🌃 <strong>Method:</strong> Tile-based overlay estimation</p>
-  </div>
-
-  <!-- Map -->
-  <div id="map"></div>
+<div id="info">
+  <p>📍 <strong>Location:</strong> <span id="coords">27.6899, 85.2986</span></p>
+  <p>🔭 <strong>Bortle Class:</strong> <span id="bortle">5–7 (Suburban average)</span></p>
+  <p>🌃 <strong>Method:</strong> Tile-based overlay estimation</p>
 </div>
 
+<div id="map" class="leaflet-container leaflet-touch leaflet-retina leaflet-fade-anim leaflet-grab leaflet-touch-drag leaflet-touch-zoom" tabindex="0" style="position: relative;"><div class="leaflet-pane leaflet-map-pane" style="transform: translate3d(0px, 0px, 0px);"><div class="leaflet-pane leaflet-tile-pane"><div class="leaflet-layer " style="z-index: 1; opacity: 1;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, 0px, 0px) scale(1);"><img alt="" src="https://a.tile.openstreetmap.org/9/377/214.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(357px, -1px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/9/377/215.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(357px, 255px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/9/376/214.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(101px, -1px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/9/378/214.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(613px, -1px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/9/376/215.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(101px, 255px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/9/378/215.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(613px, 255px, 0px); opacity: 1;"><img alt="" src="https://b.tile.openstreetmap.org/9/375/214.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-155px, -1px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/9/379/214.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(869px, -1px, 0px); opacity: 1;"><img alt="" src="https://c.tile.openstreetmap.org/9/375/215.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(-155px, 255px, 0px); opacity: 1;"><img alt="" src="https://a.tile.openstreetmap.org/9/379/215.png" class="leaflet-tile leaflet-tile-loaded" style="width: 256px; height: 256px; transform: translate3d(869px, 255px, 0px); opacity: 1;"></div></div><div class="leaflet-layer " style="z-index: 1; opacity: 0.75;"><div class="leaflet-tile-container leaflet-zoom-animated" style="z-index: 18; transform: translate3d(0px, 0px, 0px) scale(1);"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/377/214.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(357px, -1px, 0px); opacity: 1;"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/377/215.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(357px, 255px, 0px); opacity: 1;"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/376/214.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(101px, -1px, 0px); opacity: 1;"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/378/214.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(613px, -1px, 0px); opacity: 1;"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/376/215.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(101px, 255px, 0px); opacity: 1;"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/378/215.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(613px, 255px, 0px); opacity: 1;"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/375/214.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(-155px, -1px, 0px); opacity: 1;"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/379/214.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(869px, -1px, 0px); opacity: 1;"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/375/215.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(-155px, 255px, 0px); opacity: 1;"><img alt="" src="https://tiles.lightpollutionmap.info/tiles/world/9/379/215.png" class="leaflet-tile" style="width: 256px; height: 256px; transform: translate3d(869px, 255px, 0px); opacity: 1;"></div></div></div><div class="leaflet-pane leaflet-overlay-pane"></div><div class="leaflet-pane leaflet-shadow-pane"><img src="https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png" class="leaflet-marker-shadow leaflet-zoom-animated" alt="" style="margin-left: -12px; margin-top: -41px; width: 41px; height: 41px; transform: translate3d(437px, 252px, 0px);"></div><div class="leaflet-pane leaflet-marker-pane"><img src="https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png" class="leaflet-marker-icon leaflet-zoom-animated leaflet-interactive" alt="Marker" tabindex="0" role="button" style="margin-left: -12px; margin-top: -41px; width: 25px; height: 41px; transform: translate3d(437px, 252px, 0px); z-index: 252;"></div><div class="leaflet-pane leaflet-tooltip-pane"></div><div class="leaflet-pane leaflet-popup-pane"><div class="leaflet-popup  leaflet-zoom-animated" style="opacity: 1; transform: translate3d(438px, 218px, 0px); bottom: -7px; left: -68px;"><div class="leaflet-popup-content-wrapper"><div class="leaflet-popup-content" style="width: 90px;">You are here 🌎</div></div><div class="leaflet-popup-tip-container"><div class="leaflet-popup-tip"></div></div><a class="leaflet-popup-close-button" role="button" aria-label="Close popup" href="#close"><span aria-hidden="true">×</span></a></div></div><div class="leaflet-proxy leaflet-zoom-animated" style="transform: translate3d(96592.3px, 55037.4px, 0px) scale(256);"></div></div><div class="leaflet-control-container"><div class="leaflet-top leaflet-left"><div class="leaflet-control-zoom leaflet-bar leaflet-control"><a class="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in" aria-disabled="false"><span aria-hidden="true">+</span></a><a class="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out" aria-disabled="false"><span aria-hidden="true">−</span></a></div></div><div class="leaflet-top leaflet-right"></div><div class="leaflet-bottom leaflet-left"></div><div class="leaflet-bottom leaflet-right"><div class="leaflet-control-attribution leaflet-control"><a href="https://leafletjs.com" title="A JavaScript library for interactive maps"><svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8" class="leaflet-attribution-flag"><path fill="#4C7BE1" d="M0 0h12v4H0z"></path><path fill="#FFD500" d="M0 4h12v3H0z"></path><path fill="#E0BC00" d="M0 7h12v1H0z"></path></svg> Leaflet</a> <span aria-hidden="true">|</span> © OpenStreetMap, Light Pollution Map</div></div></div></div>
+
 <h3 class="section-title">📊 Light Level Visibility</h3>
-<img id="bortle-chart" src="bortle.png" alt="Bortle Scale Chart">
-<p style="text-align:left; margin-left:10px;">Source: https://www.handprint.com/ASTRO/bortle.html</p>
+
+<div id="info">
+<center><img id="\&quot;bortle-chart&quot;" src="bortle.png" height="90%" width="100%" alt="Bortle Scale Chart"></center>
+<p style="text-align: left">Source: https://www.handprint.com/ASTRO/bortle.html</p>
+</div>
 
 <h3 class="section-title">🔊 Sound Pollution Estimate</h3>
-<div id="sound-info" style="padding:15px; margin:20px; border-radius:12px; background:rgba(255,255,255,0.6); box-shadow:0 4px 10px rgba(0,0,0,0.15); backdrop-filter:blur(6px);">
-  <p>🎧 <strong>Noise Level:</strong> <span id="noise">Calculating…</span></p>
+
+<div id="sound-info">
+  <p>🎧 <strong>Noise Level:</strong> <span id="noise">Medium to High – Typical urban noise</span></p>
   <p>📡 <strong>Method:</strong> Urban density + traffic proxy estimation</p>
 </div>
 
+<h3 class="section-title">🎤 Live Microphone Noise Check</h3>
+<div id="live-sound" style="padding:15px;margin:20px;border-radius:12px;background:rgba(255,255,255,0.6);box-shadow:0 4px 10px rgba(0,0,0,0.15);backdrop-filter:blur(6px);">
+  <p>🔊 <strong>Live Noise Level:</strong> <span id="live-noise">Click start…</span></p>
+  <button onclick="startMic()" style="padding:10px 20px;border:none;border-radius:8px;background:var(--accent);color:white;font-size:1rem;cursor:pointer;">Start Mic Measurement</button>
+</div>
+
+<h3 class="section-title">📊 Noise Level Health Guide</h3>
+
+<table style="width:90%;margin:20px auto;border-collapse:collapse;font-size:1rem;background:rgba(255,255,255,0.6);backdrop-filter:blur(6px);box-shadow:0 4px 10px rgba(0,0,0,0.15);border-radius:10px;overflow:hidden;border:2px solid black;">
+  <tbody><tr style="background:var(--accent);color:black;border:1px solid black;">
+    <th style="padding:10px;border:1px solid black;color:black;">Noise Level (dB)</th>
+    <th style="padding:10px;border:1px solid black;color:black;">Effect on Health</th>
+  </tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">0–30 dB</td><td style="padding:10px;border:1px solid black;color:black;">Very quiet, healthy, ideal for sleep</td></tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">30–60 dB</td><td style="padding:10px;border:1px solid black;color:black;">Normal conversation level, safe</td></tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">60–85 dB</td><td style="padding:10px;border:1px solid black;color:black;">Can cause stress with long exposure</td></tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">85–100 dB</td><td style="padding:10px;border:1px solid black;color:black;">Harmful over time, hearing risk</td></tr>
+  <tr><td style="padding:10px;border:1px solid black;color:black;">100+ dB</td><td style="padding:10px;border:1px solid black;color:black;">Unsafe, can cause ear damage quickly</td></tr>
+</tbody></table>
+
+<br>
+
+<h3 class="section-title">🧪 pH of Common Daily Liquids &amp; Health Impact</h3>
+
+<table style="width:98%;margin:20px auto;border-collapse:collapse;font-size:0.95rem;
+background:rgba(255,255,255,0.65);backdrop-filter:blur(6px);
+box-shadow:0 4px 10px rgba(0,0,0,0.15);
+border-radius:10px;overflow:hidden;border:2px solid black;">
+
+  <tbody><tr style="background:var(--accent);color:black;">
+    <th rowspan="2" style="padding:10px;border:1px solid black;">Liquid</th>
+    <th rowspan="2" style="padding:10px;border:1px solid black;">Typical pH</th>
+    <th rowspan="2" style="padding:10px;border:1px solid black;">Why pH Changes</th>
+    <th colspan="2" style="padding:10px;border:1px solid black;">Health Concerns</th>
+  </tr>
+
+  <tr style="background:#cfe87a;">
+    <th style="padding:10px;border:1px solid black;">Lower pH (More Acidic)</th>
+    <th style="padding:10px;border:1px solid black;">Higher pH (More Alkaline)</th>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Drinking Water</td>
+    <td style="padding:10px;border:1px solid black;">6.5 – 8.5</td>
+    <td style="padding:10px;border:1px solid black;">CO₂ dissolution, pipe corrosion, minerals</td>
+    <td style="padding:10px;border:1px solid black;">Stomach irritation, tooth enamel damage</td>
+    <td style="padding:10px;border:1px solid black;">Bitter taste, digestive discomfort</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Milk</td>
+    <td style="padding:10px;border:1px solid black;">6.4 – 6.8</td>
+    <td style="padding:10px;border:1px solid black;">Bacterial growth → lactic acid</td>
+    <td style="padding:10px;border:1px solid black;">Spoilage, food poisoning risk</td>
+    <td style="padding:10px;border:1px solid black;">Usually minimal health impact</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Fruit Juices</td>
+    <td style="padding:10px;border:1px solid black;">2.0 – 4.0</td>
+    <td style="padding:10px;border:1px solid black;">Fermentation, dilution</td>
+    <td style="padding:10px;border:1px solid black;">Enamel erosion, acid reflux</td>
+    <td style="padding:10px;border:1px solid black;">Reduced nutritional quality</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Soft Drinks / Cola</td>
+    <td style="padding:10px;border:1px solid black;">2.3 – 2.8</td>
+    <td style="padding:10px;border:1px solid black;">Carbonation loss</td>
+    <td style="padding:10px;border:1px solid black;">Tooth decay, stomach lining irritation</td>
+    <td style="padding:10px;border:1px solid black;">Less acidic but still unhealthy</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Tea / Coffee</td>
+    <td style="padding:10px;border:1px solid black;">4.5 – 6.5</td>
+    <td style="padding:10px;border:1px solid black;">Brewing strength, additives</td>
+    <td style="padding:10px;border:1px solid black;">Acidity, gastric irritation</td>
+    <td style="padding:10px;border:1px solid black;">Reduced antioxidant effectiveness</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Shampoo / Soap</td>
+    <td style="padding:10px;border:1px solid black;">4.5 – 10.0</td>
+    <td style="padding:10px;border:1px solid black;">Formulation, dilution</td>
+    <td style="padding:10px;border:1px solid black;">Scalp irritation (too acidic)</td>
+    <td style="padding:10px;border:1px solid black;">Skin dryness, barrier damage</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Toothpaste</td>
+    <td style="padding:10px;border:1px solid black;">7.0 – 9.0</td>
+    <td style="padding:10px;border:1px solid black;">Moisture exposure</td>
+    <td style="padding:10px;border:1px solid black;">Increased tooth sensitivity</td>
+    <td style="padding:10px;border:1px solid black;">Mouth irritation if too alkaline</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Vinegar</td>
+    <td style="padding:10px;border:1px solid black;">2.4 – 3.0</td>
+    <td style="padding:10px;border:1px solid black;">Dilution</td>
+    <td style="padding:10px;border:1px solid black;">Throat burn, tooth erosion</td>
+    <td style="padding:10px;border:1px solid black;">Reduced antimicrobial action</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Hand Sanitizer</td>
+    <td style="padding:10px;border:1px solid black;">6.0 – 7.5</td>
+    <td style="padding:10px;border:1px solid black;">Alcohol evaporation</td>
+    <td style="padding:10px;border:1px solid black;">Skin irritation</td>
+    <td style="padding:10px;border:1px solid black;">Dryness, microbiome damage</td>
+  </tr>
+
+  <tr>
+    <td style="padding:10px;border:1px solid black;">Blood (Reference)</td>
+    <td style="padding:10px;border:1px solid black;">7.35 – 7.45</td>
+    <td style="padding:10px;border:1px solid black;">Respiratory/metabolic imbalance</td>
+    <td style="padding:10px;border:1px solid black;">Acidosis – life-threatening</td>
+    <td style="padding:10px;border:1px solid black;">Alkalosis – life-threatening</td>
+  </tr>
+
+</tbody></table>
+
 <script>
-  // Bortle & Noise estimation
   function estimateBortle(lat) {
     if (lat > 60 || lat < -60) return "2–3 (Generally dark)";
     return "5–7 (Suburban average)";
   }
+
   function estimateNoise(lat, lon) {
     if (lat > 55) return "Low – Mostly natural environment";
     return "Medium to High – Typical urban noise";
   }
 
-  // Map and location
   function initMap(lat, lon) {
     document.getElementById("coords").innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
 
@@ -172,33 +282,57 @@
       alert("Geolocation not supported");
       return;
     }
+
     navigator.geolocation.getCurrentPosition(
       pos => initMap(pos.coords.latitude, pos.coords.longitude),
       () => alert("Location access denied")
     );
   }
+
   getLocation();
 
-  // Live AQI fetch from API
-  async function fetchAQI() {
-    try {
-      const res = await fetch("/api/data"); // replace with your API endpoint
-      const data = await res.json();
+async function startMic() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(stream);
 
-      const aqiEl = document.getElementById("aqi-display");
-      aqiEl.innerText = data.aqi;
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
 
-      // Color coding
-      if (data.aqi <= 700) aqiEl.style.color = "green";
-      else if (data.aqi <= 1500) aqiEl.style.color = "orange";
-      else aqiEl.style.color = "red";
-    } catch (err) {
-      console.error("Failed to fetch AQI:", err);
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    function measure() {
+      analyser.getByteFrequencyData(dataArray);
+      let sum = 0;
+      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+      const average = sum / dataArray.length;
+
+      const db = Math.round((average / 255) * 100);
+      document.getElementById("live-noise").innerText = db + " dB (approx)";
+
+      requestAnimationFrame(measure);
+
+      if (db > 100) {
+        const buzz = new AudioContext();
+        const oscillator = buzz.createOscillator();
+        oscillator.frequency.setValueAtTime(600, buzz.currentTime);
+        oscillator.connect(buzz.destination);
+        oscillator.start();
+        setTimeout(() => oscillator.stop(), 300);
+      }
     }
+
+    measure();
+  } catch (err) {
+    document.getElementById("live-noise").innerText = "Microphone access denied";
   }
-  setInterval(fetchAQI, 5000);
-  fetchAQI();
+}
 </script>
 
-</body>
-</html>
+
+
+
+
+</body></html>
