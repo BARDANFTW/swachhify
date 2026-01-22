@@ -4,250 +4,98 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Swachhify - Environment Station</title>
-  <link rel="icon" type="image/png" href="swachhify_logo.png">
-
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-  
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* --- 1. GLOBAL VARIABLES --- */
-    :root {
-      --primary: #B6D83D; 
-      --accent: #3c8c18;
-      --dark: #1a1a1a;
-      --light: #ffffff;
-      --card-bg: rgba(255, 255, 255, 0.96);
-      --shadow: 0 4px 12px rgba(0,0,0,0.08);
-      --radius: 16px;
-    }
-
+    /* --- STYLES (Clean & Professional) --- */
+    :root { --primary: #B6D83D; --accent: #3c8c18; --dark: #1a1a1a; --card-bg: rgba(255, 255, 255, 0.96); }
     * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: var(--primary); color: var(--dark); overflow-x: hidden; }
 
-    body {
-      margin: 0; padding: 0;
-      font-family: 'Poppins', sans-serif;
-      background: var(--primary);
-      color: var(--dark);
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
+    /* Header */
+    header { padding: 20px 15px; text-align: center; animation: slideDown 0.8s ease-out; }
+    header img { height: 100px; width: 100px; display: block; margin: 0 auto 10px auto; animation: float 6s infinite; }
+    .slogan { font-weight: 700; color: white; text-transform: uppercase; margin: 0; opacity: 0; animation: fadeIn 1s ease forwards 0.5s; }
 
-    /* --- 2. HEADER --- */
-    header {
-      padding: 20px 15px;
-      text-align: center;
-      background: var(--primary);
-      animation: slideDown 0.8s ease-out;
-    }
-    header img {
-      height: 120px; width: 120px; display: block; margin: 0 auto 10px auto;
-      animation: float 6s ease-in-out infinite;
-    }
-    .slogan {
-      font-weight: 700; color: white; text-transform: uppercase; margin: 0;
-      opacity: 0; animation: fadeIn 1s ease forwards 0.5s;
-    }
-    @media (min-width: 769px) { .slogan { font-size: 24px; letter-spacing: 18px; } }
-    @media (max-width: 768px) { .slogan { font-size: 18px; letter-spacing: 4px; } header img { height: 100px; width: 100px; } }
+    /* Dashboard Grid */
+    .dashboard { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; gap: 20px; }
+    @media (min-width: 992px) { .dashboard { grid-template-columns: 2fr 1fr 1fr; } .col-span-2 { grid-column: span 2; } .row-span-2 { grid-row: span 2; } }
+    @media (max-width: 991px) { .dashboard { grid-template-columns: 1fr; } }
 
-    /* --- 3. DASHBOARD GRID --- */
-    .dashboard {
-      max-width: 1200px; margin: 0 auto; padding: 20px;
-      display: grid; gap: 20px;
-    }
-    @media (min-width: 992px) {
-      .dashboard { grid-template-columns: 2fr 1fr 1fr; }
-      .col-span-2 { grid-column: span 2; }
-      .row-span-2 { grid-row: span 2; }
-    }
-    @media (min-width: 600px) and (max-width: 991px) {
-      .dashboard { grid-template-columns: 1fr 1fr; }
-      .full-width-tablet { grid-column: span 2; }
-    }
-    @media (max-width: 599px) {
-      .dashboard { grid-template-columns: 1fr; padding: 15px; }
-      .col-span-2, .row-span-2 { grid-column: span 1; grid-row: span 1; }
-    }
+    /* Cards */
+    .card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); animation: fadeInUp 0.6s ease-out forwards; position: relative; }
+    .section-title { font-size: 1.1rem; color: var(--accent); font-weight: 700; text-transform: uppercase; border-left: 4px solid var(--accent); padding-left: 10px; margin-bottom: 15px; }
 
-    /* --- 4. CARDS --- */
-    .card {
-      background: var(--card-bg); border-radius: var(--radius); padding: 20px;
-      box-shadow: var(--shadow); border: 1px solid rgba(0,0,0,0.03);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      animation: fadeInUp 0.6s ease-out forwards; opacity: 0; position: relative;
-    }
-    @media (hover: hover) { .card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); } }
+    /* Map */
+    #map { width: 100%; height: 300px; background: #000; border-radius: 12px; position: relative; z-index: 1; }
+    .locate-btn { position: absolute; top: 10px; right: 10px; z-index: 999; background: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+    .locate-btn:hover { background: #eee; }
 
-    .section-title {
-      font-size: 1.1rem; color: var(--accent); font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;
-      border-left: 4px solid var(--accent); padding-left: 10px;
-    }
-
-    /* --- 5. COMPONENTS --- */
-    #map { width: 100%; background: #000; border-radius: 12px; border: 2px solid #eee; position: relative; }
-    @media (min-width: 769px) { #map { height: 350px; } }
-    @media (max-width: 768px) { #map { height: 250px; } }
-
-    /* Floating Locate Button */
-    .locate-btn {
-      position: absolute; top: 15px; right: 15px; z-index: 999;
-      background: white; border: none; padding: 8px 12px; border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; font-weight: 600; font-size: 0.8rem;
-    }
-    .locate-btn:hover { background: #f0f0f0; }
-
+    /* Sensors & Weather */
     .sensor-value { font-size: 2rem; font-weight: 700; color: #333; }
+    .weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
+    .weather-item { background: #f5f5f5; padding: 10px; border-radius: 8px; }
     
-    .mic-btn {
-      width: 100%; padding: 15px; border: none; border-radius: 12px;
-      background: var(--accent); color: white; font-weight: 600; font-size: 1rem;
-      cursor: pointer; transition: 0.2s; margin-top: 10px;
-    }
-    .mic-btn:active { transform: scale(0.96); }
-    .mic-btn.pulsing { background: #d32f2f; animation: pulse 1.5s infinite; }
-
-    /* Weather */
-    .weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .weather-item { background: rgba(0,0,0,0.03); padding: 10px; border-radius: 8px; text-align: center; }
-
-    /* Chart */
-    .chart-container { display: flex; align-items: flex-end; height: 100px; gap: 8px; padding-top: 20px; }
-    .bar { flex: 1; background: #ddd; border-radius: 4px 4px 0 0; transition: height 1s ease; }
-    .bar.active { background: var(--primary); }
-
-    /* Tables */
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    th, td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
-    th { color: var(--accent); border-bottom: 2px solid var(--accent); }
-
     /* Animations */
     @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+    /* Mic Button */
+    .mic-btn { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .mic-btn.pulsing { background: #d32f2f; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.5); } 70% { box-shadow: 0 0 0 12px rgba(211, 47, 47, 0); } 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); } }
-    @keyframes fadeIn { to { opacity: 1; } }
-
-    .card:nth-child(1) { animation-delay: 0.1s; }
-    .card:nth-child(2) { animation-delay: 0.2s; }
-    .card:nth-child(3) { animation-delay: 0.3s; }
-    .card:nth-child(4) { animation-delay: 0.4s; }
-    .card:nth-child(5) { animation-delay: 0.5s; }
-
   </style>
 </head>
 <body>
 
 <header>
-  <img src="swachhify_logo.png" alt="Swachhify" onerror="this.style.display='none'">
+  <img src="swachhify_logo.png" alt="Logo" onerror="this.style.display='none'"> 
   <h1 class="slogan">SENSE MORE LIVE BETTER</h1>
 </header>
 
 <div class="dashboard">
 
   <div class="card col-span-2 row-span-2">
-    <div class="section-title">📍 Live Location</div>
+    <div class="section-title">📍 Location</div>
     <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.9rem;">
-      <span id="coords-display"><strong>Status:</strong> Initializing...</span>
-      <span>Layer: <strong style="color:var(--accent)">NASA Night Lights</strong></span>
+      <span id="coords-display">Status: <strong>Initializing...</strong></span>
+      <span id="loc-method" style="font-size:0.8rem; color:#666;"></span>
     </div>
-    
     <div id="map">
-      <button class="locate-btn" onclick="forceLocate()">🎯 Locate Me</button>
+      <button class="locate-btn" onclick="attemptLocationStrategy()">🎯 Re-Locate</button>
     </div>
   </div>
 
   <div class="card">
-    <div class="section-title">📡 Live Sensors</div>
-    
-    <div style="margin-bottom: 20px;">
-      <p style="margin:0 0 5px 0; font-weight:500;">Air Quality (AQI)</p>
-      <div style="display:flex; align-items:baseline; justify-content:space-between;">
-        <span id="aqi-display" class="sensor-value">--</span>
-        <span style="font-size:0.75rem; color:green">● Online</span>
-      </div>
-      <div style="height:6px; background:#eee; border-radius:3px; margin-top:5px; overflow:hidden;">
-        <div id="aqi-bar" style="width:0%; height:100%; background:#ccc; transition: width 1s;"></div>
-      </div>
-    </div>
-
-    <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
-
-    <p style="margin:0 0 5px 0; font-weight:500;">Noise Level</p>
-    <div style="display:flex; align-items:baseline; justify-content:space-between;">
-      <span id="live-noise" class="sensor-value" style="font-size:1.6rem;">Inactive</span>
-      <span style="font-size:0.75rem;">Mic Monitor</span>
-    </div>
-    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
-  </div>
-
-  <div class="card">
-    <div class="section-title">☁️ Live Weather</div>
+    <div class="section-title">☁️ Weather</div>
     <div style="text-align:center; margin-bottom:15px;">
-      <span id="temp" style="font-size:2.8rem; font-weight:700;">--°C</span>
-      <p id="weather-desc" style="margin:0; color:#666;">Waiting for loc...</p>
+      <span id="temp" style="font-size:2.5rem; font-weight:700;">--°C</span>
+      <p id="weather-desc" style="margin:0; color:#666;">Loading...</p>
     </div>
     <div class="weather-grid">
-      <div class="weather-item">
-        <span style="font-size:1.2rem;">💨</span>
-        <p style="margin:5px 0; font-size:0.85rem; color:#555;">Wind</p>
-        <strong id="wind">--</strong> <span style="font-size:0.7rem;">km/h</span>
-      </div>
-      <div class="weather-item">
-        <span style="font-size:1.2rem;">💧</span>
-        <p style="margin:5px 0; font-size:0.85rem; color:#555;">Humidity</p>
-        <strong id="humidity">--</strong> <span style="font-size:0.7rem;">%</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="card col-span-2">
-    <div class="section-title">📈 Pollution Trend (1hr)</div>
-    <div class="chart-container" id="chart-bars"></div>
-    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px;">
-      <span>-60 mins</span> <span>-30 mins</span> <span>Now</span>
+      <div class="weather-item">💨 <br><strong id="wind">--</strong> km/h</div>
+      <div class="weather-item">💧 <br><strong id="humidity">--</strong> %</div>
     </div>
   </div>
 
   <div class="card">
-    <div class="section-title">📸 Report Incident</div>
-    <p style="font-size:0.85rem; color:#666; margin-bottom:15px;">
-      See garbage burning? Snap a picture.
-    </p>
-    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleUpload(this)">
-    <button onclick="document.getElementById('cameraInput').click()" 
-      style="background:#333; color:white; border:none; padding:12px; border-radius:50px; font-weight:600; cursor:pointer; width:100%; display:flex; align-items:center; justify-content:center; gap:10px;">
-      <span style="font-size:1.2rem;">📷</span> Take Photo
-    </button>
-    <p id="upload-status" style="font-size:0.8rem; color:green; text-align:center; margin-top:10px; display:none;">
-      ✓ Report Sent!
-    </p>
-  </div>
-
-  <div class="card">
-    <div class="section-title">🔭 Env. Estimates</div>
-    <div style="margin-bottom:10px;">
-      <p style="font-size:0.8rem; color:#666; margin:0;">Light Pollution</p>
-      <p id="bortle" style="font-weight:600; font-size:1.1rem; margin:2px 0;">--</p>
+    <div class="section-title">📡 Sensors</div>
+    <p style="margin-bottom:5px;"><strong>Air Quality (AQI)</strong></p>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+      <span id="aqi-display" class="sensor-value">--</span>
+      <span style="color:green; font-size:0.8rem;">● Online</span>
     </div>
-    <div>
-      <p style="font-size:0.8rem; color:#666; margin:0;">Sky Visibility</p>
-      <p id="sky-quality" style="font-weight:600; font-size:1.1rem; margin:2px 0;">--</p>
+    <div style="height:6px; background:#eee; width:100%; border-radius:3px; margin-top:5px;">
+      <div id="aqi-bar" style="width:0%; height:100%; background:green; transition:1s;"></div>
     </div>
-  </div>
-
-  <div class="card col-span-2">
-    <div class="section-title">📊 Health Guide</div>
-    <table>
-      <thead><tr><th>dB Level</th><th>Impact</th></tr></thead>
-      <tbody>
-        <tr><td>0 – 40 dB</td><td>Quiet / Safe</td></tr>
-        <tr><td>40 – 70 dB</td><td>Normal Conversation</td></tr>
-        <tr><td style="color:orange; font-weight:bold;">70 – 85 dB</td><td>Annoying / Traffic</td></tr>
-        <tr><td style="color:red; font-weight:bold;">85+ dB</td><td>Harmful over time</td></tr>
-      </tbody>
-    </table>
+    <hr style="margin:20px 0; border-top:1px solid #eee;">
+    <p style="margin-bottom:5px;"><strong>Noise Level</strong></p>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+      <span id="live-noise" class="sensor-value" style="font-size:1.5rem;">Off</span>
+    </div>
+    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Mic</button>
   </div>
 
 </div>
@@ -255,176 +103,92 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-  // ==========================
-  // 1. ROBUST MAP & LOCATION LOGIC
-  // ==========================
-  
-  // Default fallback location (Kathmandu)
-  const DEFAULT_LAT = 27.6899;
-  const DEFAULT_LON = 85.2986;
+  // --- 1. THE ULTIMATE LOCATION FIX ---
+  // Strategy: Try GPS -> If fails/blocked -> Use IP Address API
 
-  // Initialize immediately with default to prevent blank screen
-  initMap(DEFAULT_LAT, DEFAULT_LON, false);
-
-  function initMap(lat, lon, isLive) {
-    const coordsDiv = document.getElementById("coords-display");
+  function attemptLocationStrategy() {
+    const status = document.getElementById("coords-display");
+    const method = document.getElementById("loc-method");
     
-    // Update text
-    if (isLive) {
-      coordsDiv.innerHTML = `<strong>Coords:</strong> ${lat.toFixed(4)}, ${lon.toFixed(4)}`;
-      coordsDiv.style.color = "green";
+    status.innerHTML = "Status: <strong>Locating...</strong>";
+
+    // Step 1: Try Browser GPS (Best Accuracy)
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          // Success via GPS
+          loadMap(pos.coords.latitude, pos.coords.longitude, "GPS Accurate");
+        },
+        (err) => {
+          // Failed (Blocked or User Denied) -> Switch to IP Fallback
+          console.warn("GPS Failed, switching to IP Geolocation.");
+          fallbackToIP(); 
+        },
+        { timeout: 5000 }
+      );
     } else {
-      coordsDiv.innerHTML = `<strong>Status:</strong> Using Default (Click Locate Me)`;
-      coordsDiv.style.color = "#666";
+      fallbackToIP();
     }
+  }
 
-    // Initialize or Update Map
-    const zoomLevel = window.innerWidth > 768 ? 9 : 7;
+  // Step 2: IP Address Fallback (Works on PC/File Protocol)
+  async function fallbackToIP() {
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      const data = await res.json();
+      if(data.latitude && data.longitude) {
+        loadMap(data.latitude, data.longitude, "IP Estimate (GPS Blocked)");
+      } else {
+        throw new Error("IP Lookup failed");
+      }
+    } catch (e) {
+      // Step 3: Absolute Fail (Default to Kathmandu)
+      loadMap(27.6899, 85.2986, "Default (Loc Failed)");
+      alert("Could not detect location via GPS or IP. Showing Default.");
+    }
+  }
+
+  // --- MAP RENDERER ---
+  function loadMap(lat, lon, source) {
+    document.getElementById("coords-display").innerHTML = `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`;
+    document.getElementById("loc-method").innerText = source;
     
-    if (window.mapInstance) {
-      // If map exists, just fly to new location
-      window.mapInstance.flyTo([lat, lon], 10);
-      
-      // Move marker
-      if(window.markerInstance) window.markerInstance.setLatLng([lat, lon]);
-      else window.markerInstance = L.marker([lat, lon]).addTo(window.mapInstance);
-
-    } else {
-      // Create Map from scratch
-      window.mapInstance = L.map("map").setView([lat, lon], zoomLevel);
-
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; CARTO', maxZoom: 19
-      }).addTo(window.mapInstance);
-
-      // NASA Layer
+    // Initialize Map only once
+    if (!window.mapInstance) {
+      window.mapInstance = L.map("map").setView([lat, lon], 13);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '©CARTO' }).addTo(window.mapInstance);
       L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.jpg', {
-        bounds: [[-85, -180], [85, 180]], minZoom: 1, maxZoom: 8,
-        format: 'image/jpg', time: '', tilematrixset: 'GoogleMapsCompatible_Level', opacity: 0.6, attribution: 'NASA GIBS'
+        minZoom: 1, maxZoom: 8, opacity: 0.6 
       }).addTo(window.mapInstance);
-
-      window.markerInstance = L.marker([lat, lon]).addTo(window.mapInstance).bindPopup("Swachhify Device").openPopup();
+      window.marker = L.marker([lat, lon]).addTo(window.mapInstance).bindPopup("Your Location").openPopup();
+    } else {
+      window.mapInstance.setView([lat, lon], 13);
+      window.marker.setLatLng([lat, lon]);
     }
 
-    // Refresh Data based on new location
+    // Trigger Weather Fetch
     fetchWeather(lat, lon);
-    updateEstimates(lat);
   }
 
-  // --- FORCE LOCATION FUNCTION ---
-  function forceLocate() {
-    const coordsDiv = document.getElementById("coords-display");
-    coordsDiv.innerHTML = "<strong>Status:</strong> Requesting Access...";
-    
-    if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser.");
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        // SUCCESS
-        initMap(pos.coords.latitude, pos.coords.longitude, true);
-      },
-      (err) => {
-        // ERROR HANDLING
-        console.warn(err);
-        let msg = "Error.";
-        if(err.code === 1) msg = "Permission Denied. Allow Location!";
-        if(err.code === 2) msg = "Position Unavailable (Check GPS).";
-        if(err.code === 3) msg = "Timeout.";
-        
-        // Alert user if on HTTP/File
-        if(window.location.protocol === 'file:') {
-          msg = "Browser blocked location (File protocol).";
-          alert("Note: Browsers often block location on local files. Try running via a local server (localhost) or upload to a secure HTTPS site.");
-        }
-        
-        coordsDiv.innerHTML = `<strong style="color:red">${msg}</strong>`;
-      },
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-    );
-  }
-
-  // Try auto-locate on load once
-  forceLocate();
+  // Auto-Start Location on Load
+  attemptLocationStrategy();
 
 
-  // ==========================
-  // 2. DATA FETCHING
-  // ==========================
+  // --- 2. WEATHER & DATA ---
   async function fetchWeather(lat, lon) {
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`;
-      const res = await fetch(url);
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`);
       const data = await res.json();
-      
       document.getElementById("temp").innerText = Math.round(data.current.temperature_2m) + "°C";
       document.getElementById("wind").innerText = data.current.wind_speed_10m;
       document.getElementById("humidity").innerText = data.current.relative_humidity_2m;
-      document.getElementById("weather-desc").innerText = "Live Report";
-    } catch (e) { document.getElementById("weather-desc").innerText = "Weather Unavailable"; }
+      document.getElementById("weather-desc").innerText = "Live Data";
+    } catch(e) { console.log("Weather error"); }
   }
 
-  function updateEstimates(lat) {
-    let bortle = "Class 3 (Rural)"; let desc = "Clear Milky Way";
-    if (Math.abs(lat) > 20 && Math.abs(lat) < 50) { bortle = "Class 7 (Urban)"; desc = "Bright Sky"; }
-    document.getElementById("bortle").innerText = bortle;
-    document.getElementById("sky-quality").innerText = desc;
-  }
-
-  // ==========================
-  // 3. UTILS & CHARTS
-  // ==========================
-  function renderChart() {
-    const container = document.getElementById("chart-bars");
-    container.innerHTML = "";
-    for(let i=0; i<12; i++) {
-      const h = Math.floor(Math.random() * (90 - 20) + 20);
-      const bar = document.createElement("div");
-      bar.className = i === 11 ? "bar active" : "bar";
-      bar.style.height = h + "%";
-      container.appendChild(bar);
-    }
-  }
-  renderChart();
-
-  async function fetchAQI() {
-    try {
-      // Simulate real fetch
-      const randomAQI = Math.floor(Math.random() * (180 - 40) + 40);
-      updateAQI(randomAQI);
-    } catch (e) {}
-  }
-
-  function updateAQI(val) {
-    const display = document.getElementById("aqi-display");
-    const bar = document.getElementById("aqi-bar");
-    display.innerText = val;
-    let color = "#4CAF50"; 
-    if(val > 100) color = "#FF9800"; 
-    if(val > 200) color = "#f44336"; 
-    display.style.color = color;
-    bar.style.backgroundColor = color;
-    bar.style.width = Math.min((val / 300) * 100, 100) + "%";
-  }
-  setInterval(fetchAQI, 3500);
-
-  function handleUpload(input) {
-    if(input.files && input.files[0]) {
-      const status = document.getElementById("upload-status");
-      status.style.display = "block";
-      status.innerText = "Uploading...";
-      setTimeout(() => {
-        status.innerText = "✓ Report Sent Successfully!";
-        setTimeout(() => status.style.display = "none", 3000);
-      }, 1500);
-    }
-  }
-
+  // --- 3. MIC LOGIC ---
   let audioCtx, analyser, dataArray, isMicRunning = false;
   async function toggleMic() {
-    const btn = document.getElementById("btn-mic");
     if (isMicRunning) { location.reload(); return; }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -435,22 +199,30 @@
       src.connect(analyser);
       dataArray = new Uint8Array(analyser.frequencyBinCount);
       isMicRunning = true;
-      btn.innerText = "Stop Monitoring";
-      btn.classList.add("pulsing");
+      document.getElementById("btn-mic").innerText = "Stop";
+      document.getElementById("btn-mic").classList.add("pulsing");
       loopMic();
-    } catch (e) { alert("Microphone access denied. Check Permissions."); }
+    } catch (e) { alert("Mic permission denied."); }
   }
 
   function loopMic() {
-    if (!isMicRunning) return;
+    if(!isMicRunning) return;
     requestAnimationFrame(loopMic);
     analyser.getByteFrequencyData(dataArray);
-    let sum = 0;
-    for(let i=0; i<dataArray.length; i++) sum += dataArray[i];
-    let db = Math.round((sum / dataArray.length / 255) * 100); 
-    if(db < 10) db = 30; 
-    const display = document.getElementById("live-noise");
-    display.innerText = db + " dB";
-    if (db < 50) display.style.color = "green";
-    else if (db < 80) display.style.color = "orange";
-    else display
+    let sum=0; for(let i=0; i<dataArray.length; i++) sum+=dataArray[i];
+    let val = Math.round(sum/dataArray.length/255*100);
+    document.getElementById("live-noise").innerText = val + " dB";
+  }
+
+  // --- 4. AQI SIMULATION ---
+  setInterval(() => {
+    let aqi = Math.floor(Math.random() * (150 - 50) + 50);
+    document.getElementById("aqi-display").innerText = aqi;
+    let color = aqi < 100 ? "#4CAF50" : "#FF9800";
+    document.getElementById("aqi-bar").style.width = (aqi/300*100) + "%";
+    document.getElementById("aqi-bar").style.background = color;
+  }, 3000);
+
+</script>
+</body>
+</html>
