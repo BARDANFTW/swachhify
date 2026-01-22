@@ -2,22 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Swachhify - Environmental Monitor</title>
+  <title>Swachhify</title>
   <link rel="icon" type="image/png" href="swachhify_logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --main-bg: #f4f7eb; /* Softer background */
-      --brand: #B6D83D;
+      --main-bg: #B6D83D; 
       --accent: #3c8c18;
-      --alert: #e74c3c;
-      --dark: #2c3e50;
+      --dark: #1a1a1a;
       --card-bg: rgba(255, 255, 255, 0.9);
     }
 
@@ -28,36 +26,28 @@
       color: var(--dark);
     }
 
-    /* --- Header --- */
+    /* HEADER */
     header {
-      background: var(--brand);
-      color: var(--dark);
-      padding: 20px 10px;
+      background: var(--main-bg);
+      padding: 20px;
       text-align: center;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       animation: fadeDown 0.8s ease;
     }
-
-    .logo {
-      height: 80px;
-      width: auto;
-      margin-bottom: 5px;
-    }
-
+    header img { height: 150px; width: 150px; display: block; margin: 0 auto; }
     .slogan {
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: 700;
-      letter-spacing: 4px;
+      margin-top: 10px;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 18px; 
       color: white;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+      text-transform: uppercase;
     }
 
-    /* --- Dashboard Grid --- */
+    /* DASHBOARD */
     .dashboard {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
       padding: 20px;
       max-width: 1200px;
       margin: 0 auto;
@@ -66,138 +56,89 @@
     .card {
       background: var(--card-bg);
       padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.5);
-      animation: fadeIn 1s ease;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border: 2px solid rgba(0,0,0,0.05);
     }
 
-    .card h3 {
-      margin-top: 0;
+    .section-title {
+      font-size: 1.4rem;
       color: var(--accent);
-      border-bottom: 2px solid var(--brand);
-      padding-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .data-value {
-      font-size: 1.5rem;
       font-weight: bold;
-      color: var(--dark);
+      margin-bottom: 15px;
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 5px;
     }
 
-    .data-sub {
-      font-size: 0.85rem;
-      color: #666;
-    }
-
-    /* --- Map --- */
+    /* MAP FIX */
     #map {
-      height: 400px;
+      height: 350px;
       width: 100%;
-      border-radius: 15px;
-      margin-top: 15px;
-      z-index: 1;
-    }
-
-    /* --- Tables --- */
-    .table-container {
-      overflow-x: auto; /* Scroll on mobile */
-      margin-top: 20px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-      background: white;
-      border-radius: 8px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 2px solid white;
+      background: #000; /* Dark background while loading */
     }
 
-    th {
-      background: var(--accent);
-      color: white;
-      padding: 12px;
-      text-align: left;
-    }
+    /* TABLES */
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 10px; background: rgba(255,255,255,0.5); }
+    th, td { padding: 10px; border: 1px solid #333; text-align: left; }
+    th { background: var(--accent); color: white; }
 
-    td {
-      padding: 12px;
-      border-bottom: 1px solid #eee;
-    }
-
-    tr:hover { background-color: #f9f9f9; }
-
-    /* --- Mic Button --- */
+    /* BUTTONS */
     .mic-btn {
-      width: 100%;
-      padding: 15px;
-      border: none;
-      border-radius: 8px;
-      background: var(--accent);
-      color: white;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      background: var(--accent); color: white; font-family: 'Poppins', sans-serif;
+      font-weight: 600; cursor: pointer; font-size: 1rem;
     }
-    .mic-btn:hover { background: #2e6e12; }
-    .mic-active { background: var(--alert) !important; animation: pulse 1.5s infinite; }
+    .mic-btn:hover { background: #2a6310; }
 
-    /* --- Animations --- */
+    /* ANIMATIONS */
     @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-    
-    /* Image fix */
-    img#bortle-chart { width: 100%; max-width: 600px; display: block; margin: 10px auto; border-radius: 10px; }
 
   </style>
 </head>
 <body>
 
 <header>
-  <img src="swachhify_logo.png" alt="Swachhify" class="logo" onerror="this.style.display='none'">
-  <h1 style="margin:0; font-family:'Pacifico', cursive;">Swachhify</h1>
+  <img src="swachhify_logo.png" alt="Swachhify Logo" onerror="this.style.display='none'">
   <p class="slogan">SENSE MORE LIVE BETTER</p>
 </header>
 
 <div class="dashboard">
-  
-  <div class="card" style="grid-column: span 2; grid-row: span 2;">
-    <h3>📍 Live Location <span class="data-sub" id="coords">Detecting...</span></h3>
+
+  <div class="card" style="grid-column: span 1; grid-row: span 2;">
+    <div class="section-title">📍 Location Status</div>
+    <p><strong>Coords:</strong> <span id="coords">Detecting...</span></p>
     <div id="map"></div>
-    <p class="data-sub" style="margin-top: 10px;">Overlays: OpenStreetMap + LightPollutionMap.info</p>
+    <p style="font-size:0.8rem; margin-top:5px; color:#555;">Layer: NASA VIIRS Night Lights (2012)</p>
   </div>
 
   <div class="card">
-    <h3>🌫️ Air Quality (AQI)</h3>
-    <div class="data-value" id="aqi-display">Connecting...</div>
-    <p class="data-sub">Sensor: ESP32 / MQ-135</p>
-    <div style="height: 5px; width: 100%; background: #eee; margin-top: 10px; border-radius: 5px; overflow: hidden;">
-      <div id="aqi-bar" style="height: 100%; width: 0%; background: green; transition: 0.5s;"></div>
+    <div class="section-title">📡 Real-Time Sensors</div>
+    
+    <div style="margin-bottom: 20px;">
+      <p style="margin-bottom:5px;"><strong>🌫️ Air Quality (AQI)</strong></p>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <span id="aqi-display" style="font-size:1.8rem; font-weight:bold;">--</span>
+        <span style="font-size:0.8rem; color:#555;">(Source: ESP32)</span>
+      </div>
     </div>
+
+    <hr style="border:0; border-top:1px solid #ccc; margin:15px 0;">
+
+    <p style="margin-bottom:5px;"><strong>🎤 Noise Monitor</strong></p>
+    <p>Level: <span id="live-noise" style="font-weight:bold;">Ready</span></p>
+    <button class="mic-btn" id="btn-mic" onclick="toggleMic()">Start Microphone</button>
   </div>
 
   <div class="card">
-    <h3>🔭 Light Pollution</h3>
-    <div class="data-value" id="bortle">Estimating...</div>
-    <p class="data-sub">Based on Geolocation</p>
+    <div class="section-title">🔭 Light Pollution</div>
+    <p><strong>Bortle Scale:</strong> <span id="bortle">Calculating...</span></p>
+    <p><strong>Sky Quality:</strong> <span id="sky-quality">--</span></p>
     <center>
-      <img id="bortle-chart" src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Bortle_scale.svg/1200px-Bortle_scale.svg.png" alt="Bortle Scale">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Bortle_scale.svg/1200px-Bortle_scale.svg.png" style="width:100%; border-radius:8px; margin-top:10px;">
     </center>
-  </div>
-
-  <div class="card">
-    <h3>🎤 Noise Detector</h3>
-    <div class="data-value" id="live-noise">Ready</div>
-    <p class="data-sub" id="noise-status">Click start to measure</p>
-    <button class="mic-btn" onclick="toggleMic()" id="btn-mic">Start Microphone</button>
   </div>
 
 </div>
@@ -205,189 +146,166 @@
 <div class="dashboard">
   
   <div class="card">
-    <h3>📊 Noise Health Guide</h3>
-    <div class="table-container">
-      <table>
-        <tr><th>Noise Level (dB)</th><th>Effect on Health</th></tr>
-        <tr><td>0–30 dB</td><td>Very quiet, ideal for sleep</td></tr>
-        <tr><td>30–60 dB</td><td>Safe, normal conversation</td></tr>
-        <tr style="background:#fff3cd"><td>60–85 dB</td><td>Annoying, causes stress</td></tr>
-        <tr style="background:#ffcccb"><td>85–100 dB</td><td>Harmful over time</td></tr>
-        <tr style="background:#ffadad; color:red; font-weight:bold;"><td>100+ dB</td><td>Immediate danger</td></tr>
-      </table>
-    </div>
+    <div class="section-title">📊 Noise Health Guide</div>
+    <table>
+      <tr><th>dB Level</th><th>Effect</th></tr>
+      <tr><td>0–30</td><td>Very quiet</td></tr>
+      <tr><td>30–60</td><td>Normal / Safe</td></tr>
+      <tr><td>60–85</td><td>Annoying</td></tr>
+      <tr style="background:#ffcccb"><td>85+</td><td>Harmful</td></tr>
+    </table>
   </div>
 
   <div class="card">
-    <h3>🧪 Liquid pH Guide</h3>
-    <div class="table-container">
-      <table>
-        <tr><th>Liquid</th><th>pH</th><th>Health Impact</th></tr>
-        <tr><td>Water</td><td>7.0</td><td>Neutral / Healthy</td></tr>
-        <tr><td>Cola</td><td>2.5</td><td>Tooth decay / Acidity</td></tr>
-        <tr><td>Soap</td><td>9.0</td><td>Skin dryness</td></tr>
-        <tr><td>Juice</td><td>3.5</td><td>Acid Reflux Risk</td></tr>
-      </table>
-    </div>
+    <div class="section-title">🧪 pH Reference</div>
+    <table>
+      <tr><th>Liquid</th><th>pH</th><th>Risk</th></tr>
+      <tr><td>Water</td><td>7.0</td><td>None</td></tr>
+      <tr><td>Cola</td><td>2.5</td><td>Decay</td></tr>
+      <tr><td>Soap</td><td>9.0</td><td>Dryness</td></tr>
+    </table>
   </div>
 
 </div>
 
 <script>
-  // ===================================
-  // 1. MAP & GEOLOCATION
-  // ===================================
+  // ==========================
+  // 1. FIXED MAP LOGIC (NASA LAYER)
+  // ==========================
   function initMap(lat, lon) {
     document.getElementById("coords").innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
     
-    // Check if map already exists to prevent reload errors
-    if (window.mapInstance) window.mapInstance.remove();
+    // Remove old map if it exists
+    if (window.mapInstance) {
+      window.mapInstance.remove();
+    }
 
-    window.mapInstance = L.map("map").setView([lat, lon], 12);
-    
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: "© OpenStreetMap" }).addTo(window.mapInstance);
-    L.tileLayer("https://tiles.lightpollutionmap.info/tiles/world/{z}/{x}/{y}.png", { opacity: 0.6 }).addTo(window.mapInstance);
+    window.mapInstance = L.map("map").setView([lat, lon], 8); // Zoom out a bit to see lights
+
+    // Base Layer (Dark Theme to make lights pop)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap &copy; CARTO',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(window.mapInstance);
+
+    // Overlay: NASA VIIRS Earth at Night
+    // This uses a public NASA GIBS server.
+    L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.jpg', {
+      bounds: [[-85.0511287776, -179.999996], [85.0511287776, 179.999996]],
+      minZoom: 1,
+      maxZoom: 8,
+      format: 'image/jpg',
+      time: '',
+      tilematrixset: 'GoogleMapsCompatible_Level',
+      opacity: 0.6,
+      attribution: 'NASA GIBS'
+    }).addTo(window.mapInstance);
+
     L.marker([lat, lon]).addTo(window.mapInstance).bindPopup("Swachhify Device").openPopup();
 
-    // Set Estimated Values based on Location
-    document.getElementById("bortle").innerText = (lat > 60 || lat < -60) ? "Class 2 (Dark)" : "Class 6 (Urban)";
+    // Update Text Logic based on location
+    updateBortleText(lat);
   }
 
-  // Auto-detect location
+  function updateBortleText(lat) {
+    // Simple estimation logic
+    // Closer to equator (0) usually more populated/bright in this context
+    let bortleClass = "Class 4 (Rural/Suburban)";
+    let desc = "Visible Milky Way";
+
+    // If near Kathmandu/Major cities (approx logic)
+    if (lat > 26 && lat < 29) {
+      bortleClass = "Class 6-7 (Urban)";
+      desc = "Bright Sky, Few Stars";
+    }
+
+    document.getElementById("bortle").innerText = bortleClass;
+    document.getElementById("sky-quality").innerText = desc;
+  }
+
+  // Get Location
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => initMap(pos.coords.latitude, pos.coords.longitude),
-      () => initMap(27.6899, 85.2986) // Fallback: Kathmandu
+      () => initMap(27.6899, 85.2986) // Fallback to Kathmandu
     );
   } else {
     initMap(27.6899, 85.2986);
   }
 
-  // ===================================
-  // 2. LIVE MICROPHONE (OPTIMIZED)
-  // ===================================
-  let audioContext = null;
-  let isListening = false;
-  let beepCooldown = false;
+
+  // ==========================
+  // 2. AQI FETCH (Demo/Live)
+  // ==========================
+  async function fetchAQI() {
+    try {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), 1000);
+      const res = await fetch("/api/data", { signal: controller.signal });
+      clearTimeout(id);
+      const data = await res.json();
+      updateAQIDisplay(data.aqi);
+    } catch (e) {
+      // Simulate data if ESP32 is offline
+      // Remove this line if you ONLY want real data
+      updateAQIDisplay(Math.floor(Math.random() * (250 - 50) + 50));
+    }
+  }
+
+  function updateAQIDisplay(val) {
+    const el = document.getElementById("aqi-display");
+    el.innerText = val;
+    if (val <= 100) el.style.color = "#4CAF50"; // Green
+    else if (val <= 300) el.style.color = "#FF9800"; // Orange
+    else el.style.color = "#f44336"; // Red
+  }
+  setInterval(fetchAQI, 3000);
+
+
+  // ==========================
+  // 3. MICROPHONE
+  // ==========================
+  let audioCtx, analyser, dataArray;
+  let isRunning = false;
 
   async function toggleMic() {
     const btn = document.getElementById("btn-mic");
-    
-    if (isListening) {
-      location.reload(); // Simple way to stop stream completely
-      return;
-    }
+    if (isRunning) { location.reload(); return; }
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const src = audioCtx.createMediaStreamSource(stream);
+      analyser = audioCtx.createAnalyser();
       analyser.fftSize = 256;
-      source.connect(analyser);
+      src.connect(analyser);
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
 
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
-      isListening = true;
-      btn.innerText = "Stop Microphone";
-      btn.classList.add("mic-active");
-
-      function measure() {
-        if (!isListening) return;
-        analyser.getByteFrequencyData(dataArray);
-        
-        // Calculate average volume
-        let sum = 0;
-        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
-        const average = sum / dataArray.length;
-        
-        // Approx dB mapping (0-100 scale for simplicity)
-        const db = Math.round((average / 150) * 100); 
-        
-        const display = document.getElementById("live-noise");
-        display.innerText = db + " dB";
-
-        // Color coding
-        if(db < 50) display.style.color = "green";
-        else if(db < 80) display.style.color = "orange";
-        else display.style.color = "red";
-
-        // SAFETY: Only buzz once every 2 seconds max
-        if (db > 90 && !beepCooldown) {
-          playBeep();
-          beepCooldown = true;
-          setTimeout(() => beepCooldown = false, 2000); 
-        }
-
-        requestAnimationFrame(measure);
-      }
-      measure();
-
-    } catch (err) {
-      alert("Microphone access denied or error.");
-      console.error(err);
-    }
+      isRunning = true;
+      btn.innerText = "Stop Monitor";
+      btn.style.background = "#d32f2f"; // Red color to show stop
+      loopMic();
+    } catch (e) { alert("Mic Error: " + e); }
   }
 
-  function playBeep() {
-    if (!audioContext) return;
-    const osc = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    osc.connect(gain);
-    gain.connect(audioContext.destination);
-    osc.type = "sawtooth";
-    osc.frequency.value = 800; // Hz
-    osc.start();
-    gain.gain.exponentialRampToValueAtTime(0.00001, audioContext.currentTime + 0.5);
-    osc.stop(audioContext.currentTime + 0.5);
-  }
+  function loopMic() {
+    if (!isRunning) return;
+    requestAnimationFrame(loopMic);
+    analyser.getByteFrequencyData(dataArray);
 
-  // ===================================
-  // 3. AQI FETCHING (WITH DEMO MODE)
-  // ===================================
-  async function fetchAQI() {
-    const aqiText = document.getElementById("aqi-display");
-    const aqiBar = document.getElementById("aqi-bar");
+    let sum = 0;
+    for(let i=0; i<dataArray.length; i++) sum += dataArray[i];
+    let db = Math.round((sum / dataArray.length / 255) * 100);
 
-    try {
-      // 1. Try to fetch from ESP32
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 sec timeout
-      
-      const res = await fetch("/api/data", { signal: controller.signal });
-      clearTimeout(timeoutId);
-      
-      const data = await res.json();
-      updateAQI(data.aqi);
-
-    } catch (err) {
-      // 2. FALLBACK: Generate random data if ESP32 isn't connected yet (For Demo)
-      console.log("ESP32 not found, using simulation data...");
-      const simulatedAQI = Math.floor(Math.random() * (400 - 50) + 50); // Random 50-400
-      updateAQI(simulatedAQI);
-    }
-  }
-
-  function updateAQI(val) {
-    const el = document.getElementById("aqi-display");
-    const bar = document.getElementById("aqi-bar");
+    const el = document.getElementById("live-noise");
+    el.innerText = db + " dB";
     
-    el.innerText = val + " PPM";
-    
-    // Scale bar 0 to 100% based on max 1000
-    let pct = (val / 1000) * 100;
-    if(pct > 100) pct = 100;
-    bar.style.width = pct + "%";
-
-    if (val <= 200) { el.style.color = "#27ae60"; bar.style.background = "#27ae60"; }
-    else if (val <= 400) { el.style.color = "#f39c12"; bar.style.background = "#f39c12"; }
-    else { el.style.color = "#c0392b"; bar.style.background = "#c0392b"; }
+    if(db < 40) el.style.color = "green";
+    else if(db < 70) el.style.color = "orange";
+    else el.style.color = "red";
   }
-
-  // Update AQI every 3 seconds
-  setInterval(fetchAQI, 3000);
-  fetchAQI();
 
 </script>
-
 </body>
 </html>
