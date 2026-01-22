@@ -2,20 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Swachhify - Environment Monitor</title>
-  <link rel="icon" type="image/png" href="swachhify_logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swachhify – Environmental Monitoring</title>
 
+  <link rel="icon" href="swachhify_logo.png">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --primary: #B6D83D;
       --accent: #3c8c18;
-      --dark: #1a1a1a;
-      --card-bg: rgba(255,255,255,0.96);
-      --shadow: 0 4px 12px rgba(0,0,0,0.08);
+      --card: rgba(255,255,255,0.95);
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
       --radius: 16px;
     }
 
@@ -25,23 +24,23 @@
       margin: 0;
       font-family: 'Poppins', sans-serif;
       background: var(--primary);
-      color: var(--dark);
+      color: #1a1a1a;
     }
 
     header {
-      padding: 20px;
       text-align: center;
+      padding: 30px 20px;
     }
 
     header img {
-      width: 110px;
-      margin-bottom: 10px;
+      width: 120px;
     }
 
-    .slogan {
-      font-weight: 700;
-      color: white;
+    header h1 {
+      margin-top: 10px;
       letter-spacing: 6px;
+      color: white;
+      font-size: 1.4rem;
     }
 
     .dashboard {
@@ -53,27 +52,28 @@
     }
 
     @media (min-width: 992px) {
-      .dashboard { grid-template-columns: 2fr 1fr 1fr; }
-      .col-span-2 { grid-column: span 2; }
-      .row-span-2 { grid-row: span 2; }
-    }
-
-    @media (max-width: 991px) {
-      .dashboard { grid-template-columns: 1fr; }
+      .dashboard {
+        grid-template-columns: 2fr 1fr 1fr;
+      }
+      .span-2 {
+        grid-column: span 2;
+      }
+      .row-2 {
+        grid-row: span 2;
+      }
     }
 
     .card {
-      background: var(--card-bg);
-      padding: 20px;
+      background: var(--card);
       border-radius: var(--radius);
+      padding: 20px;
       box-shadow: var(--shadow);
     }
 
-    .section-title {
-      font-size: 1rem;
+    .title {
       font-weight: 700;
       color: var(--accent);
-      margin-bottom: 15px;
+      margin-bottom: 12px;
       border-left: 4px solid var(--accent);
       padding-left: 10px;
     }
@@ -84,18 +84,19 @@
       border-radius: 12px;
     }
 
-    .sensor-value {
-      font-size: 2rem;
+    .value {
+      font-size: 2.2rem;
       font-weight: 700;
     }
 
-    .sensor-sub {
+    .sub {
       font-size: 0.85rem;
       color: #666;
     }
 
-    .mic-btn {
+    button {
       width: 100%;
+      margin-top: 15px;
       padding: 14px;
       border: none;
       border-radius: 12px;
@@ -103,18 +104,10 @@
       color: white;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 12px;
     }
 
-    .mic-btn.pulsing {
-      background: #d32f2f;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(211,47,47,0.6); }
-      70% { box-shadow: 0 0 0 12px rgba(211,47,47,0); }
-      100% { box-shadow: 0 0 0 0 rgba(211,47,47,0); }
+    button.active {
+      background: #c62828;
     }
 
     table {
@@ -126,12 +119,11 @@
     th, td {
       padding: 10px;
       border-bottom: 1px solid #eee;
-      text-align: left;
     }
 
     th {
       color: var(--accent);
-      font-weight: 600;
+      text-align: left;
     }
   </style>
 </head>
@@ -140,32 +132,36 @@
 
 <header>
   <img src="swachhify_logo.png" alt="Swachhify">
-  <h1 class="slogan">SENSE MORE · LIVE BETTER</h1>
+  <h1>SENSE MORE · LIVE BETTER</h1>
 </header>
 
 <div class="dashboard">
 
-  <div class="card col-span-2 row-span-2">
-    <div class="section-title">📍 Live Location</div>
+  <!-- MAP -->
+  <div class="card span-2 row-2">
+    <div class="title">📍 Live Location</div>
     <div id="coords">Locating...</div>
     <div id="map"></div>
   </div>
 
+  <!-- SENSOR CARD -->
   <div class="card">
-    <div class="section-title">📡 Live Sensors</div>
+    <div class="title">📡 Live Sensors</div>
 
-    <p>Air Quality (AQI)</p>
-    <div class="sensor-value" id="aqi-display">--</div>
+    <p>Air Quality Index</p>
+    <div class="value" id="aqi">--</div>
+    <div class="sub">Simulated AQI</div>
 
     <hr>
 
     <p>Noise Level</p>
-    <div class="sensor-value" id="live-noise">Inactive</div>
-    <button class="mic-btn" id="btn-mic" onclick="toggleMic()">Start Monitoring</button>
+    <div class="value" id="noise">Inactive</div>
+    <button id="mic-btn" onclick="toggleMic()">Start Monitoring</button>
   </div>
 
+  <!-- GUIDE -->
   <div class="card">
-    <div class="section-title">📊 Noise Health Guide</div>
+    <div class="title">📊 Noise Health Guide</div>
     <table>
       <tr><th>dB</th><th>Effect</th></tr>
       <tr><td>0–40</td><td>Quiet</td></tr>
@@ -182,42 +178,50 @@
 <script>
 /* ================= MAP ================= */
 function initMap(lat, lon) {
-  document.getElementById("coords").innerText = lat.toFixed(4) + ", " + lon.toFixed(4);
-  const map = L.map("map").setView([lat, lon], 8);
+  document.getElementById("coords").innerText =
+    lat.toFixed(4) + ", " + lon.toFixed(4);
+
+  const map = L.map("map").setView([lat, lon], 10);
 
   L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
     maxZoom: 19
   }).addTo(map);
 
-  L.marker([lat, lon]).addTo(map).bindPopup("Swachhify Device").openPopup();
+  L.marker([lat, lon]).addTo(map)
+    .bindPopup("Swachhify Device")
+    .openPopup();
 }
 
-navigator.geolocation?.getCurrentPosition(
-  p => initMap(p.coords.latitude, p.coords.longitude),
-  () => initMap(27.6899, 85.2986)
+navigator.geolocation.getCurrentPosition(
+  pos => initMap(pos.coords.latitude, pos.coords.longitude),
+  () => initMap(27.7172, 85.3240)
 );
 
 /* ================= AQI (Demo) ================= */
 setInterval(() => {
-  const val = Math.floor(Math.random() * 150) + 40;
-  const el = document.getElementById("aqi-display");
-  el.innerText = val;
-  el.style.color = val < 100 ? "green" : val < 200 ? "orange" : "red";
+  const aqi = Math.floor(Math.random() * 180) + 40;
+  const el = document.getElementById("aqi");
+  el.innerText = aqi;
+  el.style.color = aqi < 100 ? "green" : aqi < 200 ? "orange" : "red";
 }, 4000);
 
-/* ================= MIC MONITOR (FIXED) ================= */
-let audioCtx, analyser, micStream, dataArray, running = false;
+/* ================= MIC LOGIC (FROM SECOND CODE ONLY) ================= */
+
+let audioCtx, analyser, micStream, dataArray;
+let running = false;
 
 async function toggleMic() {
-  const btn = document.getElementById("btn-mic");
+  const btn = document.getElementById("mic-btn");
+  const display = document.getElementById("noise");
 
   if (running) {
     micStream.getTracks().forEach(t => t.stop());
     audioCtx.close();
     running = false;
     btn.innerText = "Start Monitoring";
-    btn.classList.remove("pulsing");
-    document.getElementById("live-noise").innerText = "Inactive";
+    btn.classList.remove("active");
+    display.innerText = "Inactive";
+    display.style.color = "#1a1a1a";
     return;
   }
 
@@ -231,16 +235,17 @@ async function toggleMic() {
 
   dataArray = new Uint8Array(analyser.fftSize);
   running = true;
+
   btn.innerText = "Stop Monitoring";
-  btn.classList.add("pulsing");
+  btn.classList.add("active");
 
   monitorNoise();
 }
 
 function monitorNoise() {
   if (!running) return;
-  requestAnimationFrame(monitorNoise);
 
+  requestAnimationFrame(monitorNoise);
   analyser.getByteTimeDomainData(dataArray);
 
   let sum = 0;
@@ -255,9 +260,13 @@ function monitorNoise() {
   if (!isFinite(db)) db = 30;
   db = Math.min(Math.max(db, 30), 100);
 
-  const display = document.getElementById("live-noise");
+  const display = document.getElementById("noise");
   display.innerText = db + " dB";
-  display.style.color = db < 50 ? "green" : db < 80 ? "orange" : "red";
+
+  display.style.color =
+    db < 50 ? "green" :
+    db < 80 ? "orange" :
+    "red";
 }
 </script>
 
