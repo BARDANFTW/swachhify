@@ -46,6 +46,7 @@
     /* DASHBOARD */
     .dashboard {
       display: grid;
+      /* Responsive Columns: Auto-fit ensures it looks good on mobile and laptop */
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 25px;
       padding: 20px;
@@ -59,6 +60,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       border: 2px solid rgba(0,0,0,0.05);
+      animation: fadeIn 1s ease;
     }
 
     .section-title {
@@ -70,14 +72,14 @@
       padding-bottom: 5px;
     }
 
-    /* MAP FIX */
+    /* MAP SETTINGS */
     #map {
       height: 350px;
       width: 100%;
       border-radius: 12px;
       overflow: hidden;
       border: 2px solid white;
-      background: #000; /* Dark background while loading */
+      background: #000;
     }
 
     /* TABLES */
@@ -95,6 +97,7 @@
 
     /* ANIMATIONS */
     @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
   </style>
 </head>
@@ -111,7 +114,19 @@
     <div class="section-title">📍 Location Status</div>
     <p><strong>Coords:</strong> <span id="coords">Detecting...</span></p>
     <div id="map"></div>
-    <p style="font-size:0.8rem; margin-top:5px; color:#555;">Layer: NASA VIIRS Night Lights (2012)</p>
+    <p style="font-size:0.8rem; margin-top:5px; color:#555;">Layer: NASA VIIRS Night Lights</p>
+  </div>
+
+  <div class="card">
+    <div class="section-title">🔭 Light Pollution</div>
+    <p><strong>Bortle Scale:</strong> <span id="bortle">Calculating...</span></p>
+    <p><strong>Sky Condition:</strong> <span id="sky-quality">--</span></p>
+    
+    <center>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Bortle_scale.svg/1200px-Bortle_scale.svg.png" 
+           alt="Bortle Scale" 
+           style="width:100%; max-height:150px; object-fit:contain; border-radius:8px; margin-top:10px;">
+    </center>
   </div>
 
   <div class="card">
@@ -130,15 +145,6 @@
     <p style="margin-bottom:5px;"><strong>🎤 Noise Monitor</strong></p>
     <p>Level: <span id="live-noise" style="font-weight:bold;">Ready</span></p>
     <button class="mic-btn" id="btn-mic" onclick="toggleMic()">Start Microphone</button>
-  </div>
-
-  <div class="card">
-    <div class="section-title">🔭 Light Pollution</div>
-    <p><strong>Bortle Scale:</strong> <span id="bortle">Calculating...</span></p>
-    <p><strong>Sky Quality:</strong> <span id="sky-quality">--</span></p>
-    <center>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Bortle_scale.svg/1200px-Bortle_scale.svg.png" style="width:100%; border-radius:8px; margin-top:10px;">
-    </center>
   </div>
 
 </div>
@@ -170,53 +176,43 @@
 
 <script>
   // ==========================
-  // 1. FIXED MAP LOGIC (NASA LAYER)
+  // 1. MAP LOGIC (NASA Night Lights)
   // ==========================
   function initMap(lat, lon) {
     document.getElementById("coords").innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
     
-    // Remove old map if it exists
-    if (window.mapInstance) {
-      window.mapInstance.remove();
-    }
+    if (window.mapInstance) { window.mapInstance.remove(); }
 
-    window.mapInstance = L.map("map").setView([lat, lon], 8); // Zoom out a bit to see lights
+    window.mapInstance = L.map("map").setView([lat, lon], 7);
 
-    // Base Layer (Dark Theme to make lights pop)
+    // Dark Base Map (Looks cool with night theme)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap &copy; CARTO',
-      subdomains: 'abcd',
       maxZoom: 19
     }).addTo(window.mapInstance);
 
-    // Overlay: NASA VIIRS Earth at Night
-    // This uses a public NASA GIBS server.
+    // NASA Night Lights Overlay
     L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.jpg', {
       bounds: [[-85.0511287776, -179.999996], [85.0511287776, 179.999996]],
-      minZoom: 1,
-      maxZoom: 8,
-      format: 'image/jpg',
-      time: '',
-      tilematrixset: 'GoogleMapsCompatible_Level',
-      opacity: 0.6,
+      minZoom: 1, maxZoom: 8, format: 'image/jpg',
+      time: '', tilematrixset: 'GoogleMapsCompatible_Level', opacity: 0.6,
       attribution: 'NASA GIBS'
     }).addTo(window.mapInstance);
 
-    L.marker([lat, lon]).addTo(window.mapInstance).bindPopup("Swachhify Device").openPopup();
+    L.marker([lat, lon]).addTo(window.mapInstance).bindPopup("Swachhify Location").openPopup();
 
-    // Update Text Logic based on location
-    updateBortleText(lat);
+    // Update Estimates
+    updateEstimates(lat);
   }
 
-  function updateBortleText(lat) {
-    // Simple estimation logic
-    // Closer to equator (0) usually more populated/bright in this context
-    let bortleClass = "Class 4 (Rural/Suburban)";
+  function updateEstimates(lat) {
+    // Rough estimate logic based on latitude (Equator vs Poles)
+    let bortleClass = "Class 4 (Rural)";
     let desc = "Visible Milky Way";
 
-    // If near Kathmandu/Major cities (approx logic)
-    if (lat > 26 && lat < 29) {
-      bortleClass = "Class 6-7 (Urban)";
+    // Near Kathmandu/Dense Areas (Simplified logic)
+    if (lat > 20 && lat < 35) {
+      bortleClass = "Class 7 (Suburban/Urban)";
       desc = "Bright Sky, Few Stars";
     }
 
@@ -224,19 +220,17 @@
     document.getElementById("sky-quality").innerText = desc;
   }
 
-  // Get Location
+  // Init Location
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       pos => initMap(pos.coords.latitude, pos.coords.longitude),
-      () => initMap(27.6899, 85.2986) // Fallback to Kathmandu
+      () => initMap(27.6899, 85.2986)
     );
-  } else {
-    initMap(27.6899, 85.2986);
-  }
+  } else { initMap(27.6899, 85.2986); }
 
 
   // ==========================
-  // 2. AQI FETCH (Demo/Live)
+  // 2. AQI LOGIC (Demo/Live)
   // ==========================
   async function fetchAQI() {
     try {
@@ -247,27 +241,25 @@
       const data = await res.json();
       updateAQIDisplay(data.aqi);
     } catch (e) {
-      // Simulate data if ESP32 is offline
-      // Remove this line if you ONLY want real data
-      updateAQIDisplay(Math.floor(Math.random() * (250 - 50) + 50));
+      // Simulate if ESP32 disconnected
+      updateAQIDisplay(Math.floor(Math.random() * (300 - 50) + 50));
     }
   }
 
   function updateAQIDisplay(val) {
     const el = document.getElementById("aqi-display");
     el.innerText = val;
-    if (val <= 100) el.style.color = "#4CAF50"; // Green
-    else if (val <= 300) el.style.color = "#FF9800"; // Orange
-    else el.style.color = "#f44336"; // Red
+    if (val <= 100) el.style.color = "#4CAF50"; 
+    else if (val <= 300) el.style.color = "#FF9800"; 
+    else el.style.color = "#f44336"; 
   }
   setInterval(fetchAQI, 3000);
 
 
   // ==========================
-  // 3. MICROPHONE
+  // 3. MICROPHONE LOGIC
   // ==========================
-  let audioCtx, analyser, dataArray;
-  let isRunning = false;
+  let audioCtx, analyser, dataArray, isRunning = false;
 
   async function toggleMic() {
     const btn = document.getElementById("btn-mic");
@@ -284,7 +276,7 @@
 
       isRunning = true;
       btn.innerText = "Stop Monitor";
-      btn.style.background = "#d32f2f"; // Red color to show stop
+      btn.style.background = "#d32f2f";
       loopMic();
     } catch (e) { alert("Mic Error: " + e); }
   }
@@ -301,8 +293,8 @@
     const el = document.getElementById("live-noise");
     el.innerText = db + " dB";
     
-    if(db < 40) el.style.color = "green";
-    else if(db < 70) el.style.color = "orange";
+    if(db < 50) el.style.color = "green";
+    else if(db < 80) el.style.color = "orange";
     else el.style.color = "red";
   }
 
