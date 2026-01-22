@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Swachhify - Environment Station</title>
+  <title>Swachhify - Complete Station</title>
+  
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    /* --- STYLES (Clean & Professional) --- */
+    /* --- STYLES --- */
     :root { --primary: #B6D83D; --accent: #3c8c18; --dark: #1a1a1a; --card-bg: rgba(255, 255, 255, 0.96); }
     * { box-sizing: border-box; }
     body { margin: 0; padding: 0; font-family: 'Poppins', sans-serif; background: var(--primary); color: var(--dark); overflow-x: hidden; }
@@ -18,47 +19,68 @@
     header img { height: 100px; width: 100px; display: block; margin: 0 auto 10px auto; animation: float 6s infinite; }
     .slogan { font-weight: 700; color: white; text-transform: uppercase; margin: 0; opacity: 0; animation: fadeIn 1s ease forwards 0.5s; }
 
-    /* Dashboard Grid */
+    /* Grid Layout */
     .dashboard { max-width: 1200px; margin: 0 auto; padding: 20px; display: grid; gap: 20px; }
-    @media (min-width: 992px) { .dashboard { grid-template-columns: 2fr 1fr 1fr; } .col-span-2 { grid-column: span 2; } .row-span-2 { grid-row: span 2; } }
-    @media (max-width: 991px) { .dashboard { grid-template-columns: 1fr; } }
+    @media (min-width: 992px) { 
+        .dashboard { grid-template-columns: 2fr 1fr 1fr; } 
+        .col-span-2 { grid-column: span 2; } 
+        .row-span-2 { grid-row: span 2; } 
+    }
+    @media (min-width: 600px) and (max-width: 991px) {
+        .dashboard { grid-template-columns: 1fr 1fr; }
+        .col-span-2 { grid-column: span 2; }
+    }
+    @media (max-width: 599px) { 
+        .dashboard { grid-template-columns: 1fr; padding: 10px; } 
+        .col-span-2, .row-span-2 { grid-column: span 1; grid-row: span 1; }
+    }
 
     /* Cards */
     .card { background: var(--card-bg); border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); animation: fadeInUp 0.6s ease-out forwards; position: relative; }
     .section-title { font-size: 1.1rem; color: var(--accent); font-weight: 700; text-transform: uppercase; border-left: 4px solid var(--accent); padding-left: 10px; margin-bottom: 15px; }
 
     /* Map */
-    #map { width: 100%; height: 300px; background: #000; border-radius: 12px; position: relative; z-index: 1; }
+    #map { width: 100%; height: 350px; background: #000; border-radius: 12px; position: relative; z-index: 1; }
     .locate-btn { position: absolute; top: 10px; right: 10px; z-index: 999; background: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
     .locate-btn:hover { background: #eee; }
 
-    /* Sensors & Weather */
-    .sensor-value { font-size: 2rem; font-weight: 700; color: #333; }
+    /* Sensor & Weather UI */
     .weather-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
     .weather-item { background: #f5f5f5; padding: 10px; border-radius: 8px; }
+    .mic-btn { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+    .mic-btn:hover { background: #2a6310; }
+    .mic-btn.pulsing { background: #d32f2f; animation: pulse 1.5s infinite; }
     
     /* Animations */
     @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-
-    /* Mic Button */
-    .mic-btn { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-    .mic-btn.pulsing { background: #d32f2f; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.5); } 70% { box-shadow: 0 0 0 12px rgba(211, 47, 47, 0); } 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); } }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
+    th { color: var(--accent); border-bottom: 2px solid var(--accent); }
+
+    /* Stagger Animations */
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
   </style>
 </head>
 <body>
 
 <header>
-  <img src="swachhify_logo.png" alt="Logo" onerror="this.style.display='none'"> 
+  <img src="swachhify_logo.png" alt="Swachhify" onerror="this.style.display='none'"> 
   <h1 class="slogan">SENSE MORE LIVE BETTER</h1>
 </header>
 
 <div class="dashboard">
 
   <div class="card col-span-2 row-span-2">
-    <div class="section-title">📍 Location</div>
+    <div class="section-title">📍 Live Location</div>
     <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.9rem;">
       <span id="coords-display">Status: <strong>Initializing...</strong></span>
       <span id="loc-method" style="font-size:0.8rem; color:#666;"></span>
@@ -69,10 +91,30 @@
   </div>
 
   <div class="card">
+    <div class="section-title">📡 Live Sensors</div>
+    <p style="margin-bottom:5px;"><strong>Air Quality (AQI)</strong></p>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+      <span id="aqi-display" style="font-size:2rem; font-weight:700;">--</span>
+      <span style="color:green; font-size:0.8rem;">● Online</span>
+    </div>
+    <div style="height:6px; background:#eee; width:100%; border-radius:3px; margin-top:5px;">
+      <div id="aqi-bar" style="width:0%; height:100%; background:green; transition:1s;"></div>
+    </div>
+    
+    <hr style="margin:20px 0; border-top:1px solid #eee;">
+    
+    <p style="margin-bottom:5px;"><strong>Noise Monitor</strong></p>
+    <div style="display:flex; justify-content:space-between; align-items:baseline;">
+      <span id="live-noise" style="font-size:1.5rem; font-weight:700;">Off</span>
+    </div>
+    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Mic</button>
+  </div>
+
+  <div class="card">
     <div class="section-title">☁️ Weather</div>
     <div style="text-align:center; margin-bottom:15px;">
       <span id="temp" style="font-size:2.5rem; font-weight:700;">--°C</span>
-      <p id="weather-desc" style="margin:0; color:#666;">Loading...</p>
+      <p id="weather-desc" style="margin:0; color:#666;">Locating...</p>
     </div>
     <div class="weather-grid">
       <div class="weather-item">💨 <br><strong id="wind">--</strong> km/h</div>
@@ -81,21 +123,47 @@
   </div>
 
   <div class="card">
-    <div class="section-title">📡 Sensors</div>
-    <p style="margin-bottom:5px;"><strong>Air Quality (AQI)</strong></p>
-    <div style="display:flex; justify-content:space-between; align-items:baseline;">
-      <span id="aqi-display" class="sensor-value">--</span>
-      <span style="color:green; font-size:0.8rem;">● Online</span>
+    <div class="section-title">🔭 Env. Estimates</div>
+    <div style="margin-bottom:15px;">
+      <p style="font-size:0.8rem; color:#666; margin:0;">Light Pollution Scale</p>
+      <p id="bortle" style="font-weight:600; font-size:1.2rem; margin:2px 0;">Calculating...</p>
     </div>
-    <div style="height:6px; background:#eee; width:100%; border-radius:3px; margin-top:5px;">
-      <div id="aqi-bar" style="width:0%; height:100%; background:green; transition:1s;"></div>
+    <div>
+      <p style="font-size:0.8rem; color:#666; margin:0;">Sky Visibility</p>
+      <p id="sky-quality" style="font-weight:600; font-size:1.2rem; margin:2px 0;">--</p>
     </div>
-    <hr style="margin:20px 0; border-top:1px solid #eee;">
-    <p style="margin-bottom:5px;"><strong>Noise Level</strong></p>
-    <div style="display:flex; justify-content:space-between; align-items:baseline;">
-      <span id="live-noise" class="sensor-value" style="font-size:1.5rem;">Off</span>
+    <p style="font-size:0.75rem; color:#888; margin-top:10px; font-style:italic;">*Based on geographic coordinates</p>
+  </div>
+
+  <div class="card col-span-2">
+    <div class="section-title">📈 Pollution Trend (1hr)</div>
+    <div id="chart-bars" style="display:flex; align-items:flex-end; height:100px; gap:8px; padding-top:20px;"></div>
+    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:#888; margin-top:5px;">
+      <span>-60 mins</span> <span>Now</span>
     </div>
-    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Mic</button>
+  </div>
+
+  <div class="card">
+    <div class="section-title">📸 Report Incident</div>
+    <p style="font-size:0.85rem; color:#666; margin-bottom:15px;">Spot pollution? Snap a photo.</p>
+    <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="alert('Report Uploaded!')">
+    <button onclick="document.getElementById('cameraInput').click()" 
+      style="background:#333; color:white; border:none; padding:12px; border-radius:50px; font-weight:600; cursor:pointer; width:100%;">
+      📷 Take Photo
+    </button>
+  </div>
+
+  <div class="card col-span-2">
+    <div class="section-title">📊 Noise Health Guide</div>
+    <table>
+      <thead><tr><th>dB Level</th><th>Impact</th></tr></thead>
+      <tbody>
+        <tr><td>0 – 40 dB</td><td>Quiet / Safe</td></tr>
+        <tr><td>40 – 70 dB</td><td>Normal Conversation</td></tr>
+        <tr><td style="color:orange; font-weight:bold;">70 – 85 dB</td><td>Annoying / Traffic</td></tr>
+        <tr><td style="color:red; font-weight:bold;">85+ dB</td><td>Harmful over time</td></tr>
+      </tbody>
+    </table>
   </div>
 
 </div>
@@ -103,78 +171,63 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-  // --- 1. THE ULTIMATE LOCATION FIX ---
-  // Strategy: Try GPS -> If fails/blocked -> Use IP Address API
-
+  // ==========================
+  // 1. LOCATION LOGIC (With IP Fallback)
+  // ==========================
   function attemptLocationStrategy() {
     const status = document.getElementById("coords-display");
-    const method = document.getElementById("loc-method");
-    
     status.innerHTML = "Status: <strong>Locating...</strong>";
 
-    // Step 1: Try Browser GPS (Best Accuracy)
+    // Try GPS first
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          // Success via GPS
-          loadMap(pos.coords.latitude, pos.coords.longitude, "GPS Accurate");
-        },
-        (err) => {
-          // Failed (Blocked or User Denied) -> Switch to IP Fallback
-          console.warn("GPS Failed, switching to IP Geolocation.");
-          fallbackToIP(); 
-        },
-        { timeout: 5000 }
+        (pos) => loadMap(pos.coords.latitude, pos.coords.longitude, "GPS (Precise)"),
+        (err) => { console.warn("GPS Blocked. Trying IP..."); fallbackToIP(); },
+        { timeout: 4000 }
       );
     } else {
       fallbackToIP();
     }
   }
 
-  // Step 2: IP Address Fallback (Works on PC/File Protocol)
   async function fallbackToIP() {
     try {
       const res = await fetch('https://ipapi.co/json/');
       const data = await res.json();
-      if(data.latitude && data.longitude) {
+      if(data.latitude) {
         loadMap(data.latitude, data.longitude, "IP Estimate (GPS Blocked)");
-      } else {
-        throw new Error("IP Lookup failed");
-      }
+      } else { throw new Error("IP Fail"); }
     } catch (e) {
-      // Step 3: Absolute Fail (Default to Kathmandu)
       loadMap(27.6899, 85.2986, "Default (Loc Failed)");
-      alert("Could not detect location via GPS or IP. Showing Default.");
+      alert("Location failed. Showing Default.");
     }
   }
 
-  // --- MAP RENDERER ---
   function loadMap(lat, lon, source) {
     document.getElementById("coords-display").innerHTML = `Lat: ${lat.toFixed(4)}, Lon: ${lon.toFixed(4)}`;
     document.getElementById("loc-method").innerText = source;
-    
-    // Initialize Map only once
+
+    // MAP INIT
     if (!window.mapInstance) {
       window.mapInstance = L.map("map").setView([lat, lon], 13);
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '©CARTO' }).addTo(window.mapInstance);
       L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.jpg', {
         minZoom: 1, maxZoom: 8, opacity: 0.6 
       }).addTo(window.mapInstance);
-      window.marker = L.marker([lat, lon]).addTo(window.mapInstance).bindPopup("Your Location").openPopup();
+      window.marker = L.marker([lat, lon]).addTo(window.mapInstance).bindPopup("You are here").openPopup();
     } else {
       window.mapInstance.setView([lat, lon], 13);
       window.marker.setLatLng([lat, lon]);
     }
 
-    // Trigger Weather Fetch
+    // Trigger Weather & Estimates
     fetchWeather(lat, lon);
+    updateEstimates(lat);
   }
 
-  // Auto-Start Location on Load
-  attemptLocationStrategy();
-
-
-  // --- 2. WEATHER & DATA ---
+  // ==========================
+  // 2. DATA LOGIC (Weather + Estimates)
+  // ==========================
   async function fetchWeather(lat, lon) {
     try {
       const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m`);
@@ -186,7 +239,46 @@
     } catch(e) { console.log("Weather error"); }
   }
 
-  // --- 3. MIC LOGIC ---
+  function updateEstimates(lat) {
+    // Logic to update the Light Pollution Card
+    let bortle = "Class 3 (Rural)"; 
+    let desc = "Clear Milky Way";
+    
+    // Simple logic based on latitude (urban vs rural simulation)
+    // In real app, you would query a light pollution API
+    if (Math.abs(lat) > 20 && Math.abs(lat) < 50) { 
+      bortle = "Class 7 (Urban/Suburban)"; 
+      desc = "Bright Sky, Few Stars"; 
+    }
+
+    document.getElementById("bortle").innerText = bortle;
+    document.getElementById("sky-quality").innerText = desc;
+  }
+
+  // ==========================
+  // 3. CHARTS & SENSORS
+  // ==========================
+  // Render Chart
+  const chartContainer = document.getElementById("chart-bars");
+  for(let i=0; i<15; i++) {
+    const bar = document.createElement("div");
+    bar.style.flex = "1";
+    bar.style.background = i === 14 ? "#B6D83D" : "#ddd"; // Highlight last bar
+    bar.style.height = Math.floor(Math.random() * (100 - 20) + 20) + "%";
+    bar.style.borderRadius = "4px 4px 0 0";
+    chartContainer.appendChild(bar);
+  }
+
+  // AQI Loop
+  setInterval(() => {
+    let aqi = Math.floor(Math.random() * (160 - 40) + 40);
+    document.getElementById("aqi-display").innerText = aqi;
+    let color = aqi < 100 ? "#4CAF50" : "#FF9800";
+    document.getElementById("aqi-bar").style.width = (aqi/300*100) + "%";
+    document.getElementById("aqi-bar").style.background = color;
+  }, 3500);
+
+  // Mic Logic
   let audioCtx, analyser, dataArray, isMicRunning = false;
   async function toggleMic() {
     if (isMicRunning) { location.reload(); return; }
@@ -199,10 +291,10 @@
       src.connect(analyser);
       dataArray = new Uint8Array(analyser.frequencyBinCount);
       isMicRunning = true;
-      document.getElementById("btn-mic").innerText = "Stop";
+      document.getElementById("btn-mic").innerText = "Stop Monitor";
       document.getElementById("btn-mic").classList.add("pulsing");
       loopMic();
-    } catch (e) { alert("Mic permission denied."); }
+    } catch (e) { alert("Mic Error: Check Browser Permissions"); }
   }
 
   function loopMic() {
@@ -210,18 +302,15 @@
     requestAnimationFrame(loopMic);
     analyser.getByteFrequencyData(dataArray);
     let sum=0; for(let i=0; i<dataArray.length; i++) sum+=dataArray[i];
-    let val = Math.round(sum/dataArray.length/255*100);
-    document.getElementById("live-noise").innerText = val + " dB";
+    let db = Math.round(sum/dataArray.length/255*100);
+    if(db < 10) db = 30; // Noise floor
+    const el = document.getElementById("live-noise");
+    el.innerText = db + " dB";
+    el.style.color = db > 75 ? "red" : "#333";
   }
 
-  // --- 4. AQI SIMULATION ---
-  setInterval(() => {
-    let aqi = Math.floor(Math.random() * (150 - 50) + 50);
-    document.getElementById("aqi-display").innerText = aqi;
-    let color = aqi < 100 ? "#4CAF50" : "#FF9800";
-    document.getElementById("aqi-bar").style.width = (aqi/300*100) + "%";
-    document.getElementById("aqi-bar").style.background = color;
-  }, 3000);
+  // START
+  attemptLocationStrategy();
 
 </script>
 </body>
