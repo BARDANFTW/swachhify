@@ -149,7 +149,7 @@
       font-weight: 600;
       font-size: 1rem;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.2s active;
       margin-top: 10px;
     }
     .mic-btn:active { transform: scale(0.96); }
@@ -359,40 +359,26 @@
 
 
   // ==========================
-  // 3. MICROPHONE (Improved)
+  // 3. MICROPHONE (Safe)
   // ==========================
-  let audioCtx, analyser, dataArray, bufferLength, stream, isMicRunning = false, animationId;
+  let audioCtx, analyser, dataArray, isMicRunning = false;
 
   async function toggleMic() {
     const btn = document.getElementById("btn-mic");
     
     if (isMicRunning) {
-      // Stop monitoring
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-      if (audioCtx) {
-        audioCtx.close();
-      }
-      cancelAnimationFrame(animationId);
-      isMicRunning = false;
-      btn.innerText = "Start Monitoring";
-      btn.classList.remove("pulsing");
-      document.getElementById("live-noise").innerText = "Inactive";
-      document.getElementById("live-noise").style.color = "#333";
+      location.reload(); // Cleanest way to stop audio streams
       return;
     }
 
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       const src = audioCtx.createMediaStreamSource(stream);
       analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 2048; // Larger for better resolution
-      analyser.smoothingTimeConstant = 0.8; // Smooth out fluctuations
-      bufferLength = analyser.frequencyBinCount;
-      dataArray = new Float32Array(bufferLength);
+      analyser.fftSize = 256;
       src.connect(analyser);
+      dataArray = new Uint8Array(analyser.frequencyBinCount);
 
       isMicRunning = true;
       btn.innerText = "Stop Monitoring";
@@ -403,3 +389,31 @@
       alert("Microphone access denied or not available.");
     }
   }
+
+  function loopMic() {
+    if (!isMicRunning) return;
+    requestAnimationFrame(loopMic);
+    analyser.getByteFrequencyData(dataArray);
+
+    // Calculate Average Volume
+    let sum = 0;
+    for(let i=0; i<dataArray.length; i++) sum += dataArray[i];
+    let avg = sum / dataArray.length;
+    
+    // Convert to rough dB (Calibration required for real accuracy)
+    let db = Math.round((avg / 255) * 100); 
+    
+    // Noise Floor adjustments
+    if(db < 10) db = 30; // Ambient base
+
+    const display = document.getElementById("live-noise");
+    display.innerText = db + " dB";
+
+    if (db < 50) display.style.color = "green";
+    else if (db < 80) display.style.color = "orange";
+    else display.style.color = "red";
+  }
+
+</script>
+</body>
+</html>
