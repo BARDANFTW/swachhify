@@ -116,14 +116,14 @@
     @media (min-width: 992px) {
       .dashboard { grid-template-columns: 2fr 1fr 1fr; }
       .col-span-2 { grid-column: span 2; }
-      .col-span-2-desktop { grid-column: span 2; } /* New class for Bortle Scale */
+      .col-span-2-desktop { grid-column: span 2; }
     }
 
     /* TABLET LAYOUT (2 Columns) */
     @media (min-width: 600px) and (max-width: 991px) {
       .dashboard { grid-template-columns: 1fr 1fr; }
       .full-width-tablet { grid-column: span 2; }
-      .col-span-2-desktop { grid-column: span 2; } /* Keeps it full width on tablet too */
+      .col-span-2-desktop { grid-column: span 2; } 
     }
 
     /* MOBILE LAYOUT (1 Column) */
@@ -215,6 +215,13 @@
     th, td { padding: 10px; border-bottom: 1px solid var(--border-color); text-align: left; }
     th { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); }
     tr:last-child td { border-bottom: none; }
+
+    /* Scrollable table container for smaller cards */
+    .table-container {
+        overflow-x: auto;
+        max-height: 300px;
+        overflow-y: auto;
+    }
 
     @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -325,38 +332,49 @@
 
   <div class="card full-width-tablet">
     <div class="section-title">📊 Health Guide</div>
-    <table>
-      <thead><tr><th>dB Level</th><th>Impact</th></tr></thead>
-      <tbody>
-        <tr><td>0 – 40</td><td>Quiet / Library</td></tr>
-        <tr><td>40 – 70</td><td>Conversation</td></tr>
-        <tr><td style="color:orange; font-weight:bold;">70 – 85</td><td>Traffic</td></tr>
-        <tr><td style="color:red; font-weight:bold;">85+</td><td>Harmful</td></tr>
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>dB</th><th>Example</th><th>Risk</th></tr></thead>
+        <tbody>
+          <tr><td>10-30</td><td>Whisper / Leaves</td><td>Safe</td></tr>
+          <tr><td>40-50</td><td>Quiet Room</td><td>Safe</td></tr>
+          <tr><td>60</td><td>Conversation</td><td>Safe</td></tr>
+          <tr><td>70-80</td><td>Traffic / Vacuum</td><td>Annoying</td></tr>
+          <tr><td style="color:orange; font-weight:bold;">85-90</td><td>Lawn Mower</td><td>Risk (8hrs)</td></tr>
+          <tr><td style="color:red; font-weight:bold;">100-110</td><td>Concert / Horn</td><td>High Risk</td></tr>
+          <tr><td style="color:#d32f2f; font-weight:bold;">120+</td><td>Jet / Gunshot</td><td>Pain/Damage</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="card full-width-tablet">
     <div class="section-title">🧪 pH Guide</div>
-    <table>
-      <thead><tr><th>Type</th><th>pH</th><th>Risk</th></tr></thead>
-      <tbody>
-        <tr><td>Pure Water</td><td>7.0</td><td>Neutral</td></tr>
-        <tr><td>Acid Rain</td><td>< 5.0</td><td>High</td></tr>
-        <tr><td>Soapy Water</td><td>9.0+</td><td>Alkaline</td></tr>
-      </tbody>
-    </table>
+    <div class="table-container">
+      <table>
+        <thead><tr><th>pH</th><th>Example</th><th>Type</th></tr></thead>
+        <tbody>
+          <tr><td style="color:red; font-weight:bold;">0-2</td><td>Battery Acid</td><td>Strong Acid</td></tr>
+          <tr><td style="color:orange;">3-4</td><td>Acid Rain / Soda</td><td>Acidic</td></tr>
+          <tr><td style="color:#bcbc03;">5-6</td><td>Coffee / Skin</td><td>Mild Acid</td></tr>
+          <tr><td style="color:green; font-weight:bold;">7</td><td>Pure Water</td><td>Neutral</td></tr>
+          <tr><td style="color:#bcbc03;">8-9</td><td>Baking Soda</td><td>Alkaline</td></tr>
+          <tr><td style="color:blue;">10-12</td><td>Soapy Water</td><td>High Alk</td></tr>
+          <tr><td style="color:purple; font-weight:bold;">13-14</td><td>Bleach / Lye</td><td>Toxic</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div class="card col-span-2-desktop">
     <div class="section-title">🌌 Bortle Dark-Sky Scale</div>
-    <div style="overflow-x:auto;">
+    <div class="table-container">
       <table style="width:100%;">
         <thead>
           <tr>
             <th style="width:15%">Class</th>
-            <th style="width:35%">Title</th>
-            <th style="width:50%">Description</th>
+            <th style="width:30%">Title</th>
+            <th style="width:55%">Description</th>
           </tr>
         </thead>
         <tbody>
