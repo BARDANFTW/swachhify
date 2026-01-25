@@ -131,8 +131,15 @@
       border-radius: 12px;
       border: 2px solid #eee;
     }
-    /* Responsive Map Height */
-    @media (min-width: 769px) { #map { height: 400px; } }
+    
+    /* Responsive Map Height - MODIFIED TO FIX WHITE SPACE */
+    @media (min-width: 769px) { 
+        #map { 
+            height: 100%;       /* Fill container height */
+            min-height: 400px;  /* Minimum safety height */
+            flex-grow: 1;       /* Stretch to fill gap */
+        } 
+    }
     @media (max-width: 768px) { #map { height: 280px; } }
 
     /* --- 6. SENSORS & BUTTONS --- */
@@ -192,7 +199,7 @@
 
 <div class="dashboard">
 
-  <div class="card col-span-2 row-span-2">
+  <div class="card col-span-2 row-span-2" style="display:flex; flex-direction:column;">
     <div class="section-title">📍 Live Location</div>
     <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.9rem;">
       <span><strong>Coords:</strong> <span id="coords">Locating...</span></span>
