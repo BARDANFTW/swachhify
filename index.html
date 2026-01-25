@@ -115,7 +115,7 @@
     @media (min-width: 992px) {
       .dashboard { grid-template-columns: 2fr 1fr 1fr; }
       .col-span-2 { grid-column: span 2; }
-      .row-span-2 { grid-row: span 2; }
+      /* Desktop Map is compact (1 row) */
     }
     @media (min-width: 600px) and (max-width: 991px) {
       .dashboard { grid-template-columns: 1fr 1fr; }
@@ -172,8 +172,15 @@
       border-radius: 12px;
       border: 2px solid var(--border-color);
     }
-    @media (min-width: 769px) { #map { height: 100%; min-height: 400px; flex-grow: 1; } }
-    @media (max-width: 768px) { #map { height: 280px; } }
+    
+    /* DESKTOP: Compact Map */
+    @media (min-width: 769px) { 
+        #map { height: 100%; min-height: 300px; flex-grow: 1; } 
+    }
+    /* MOBILE: Original Map Height (Unchanged) */
+    @media (max-width: 768px) { 
+        #map { height: 280px; } 
+    }
 
     /* --- 6. SENSORS & BUTTONS --- */
     .sensor-value { font-size: 2rem; font-weight: 700; color: #333; }
@@ -199,13 +206,12 @@
     .mic-btn:active { transform: scale(0.96); }
     .mic-btn.pulsing { background: #d32f2f; animation: pulse 1.5s infinite; }
 
-    /* --- 7. TABLES & LAYOUT HELPERS --- */
+    /* --- 7. TABLES & UTILS --- */
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     th, td { padding: 10px; border-bottom: 1px solid var(--border-color); text-align: left; }
     th { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); }
     tr:last-child td { border-bottom: none; }
 
-    /* --- 8. ANIMATIONS & UTILS --- */
     @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
@@ -239,7 +245,7 @@
 
 <div class="dashboard">
 
-  <div class="card col-span-2 row-span-2" style="display:flex; flex-direction:column;">
+  <div class="card col-span-2" style="display:flex; flex-direction:column;">
     <div class="section-title">📍 Live Location</div>
     <div style="display:flex; justify-content:space-between; margin-bottom:10px; font-size:0.9rem;">
       <span><strong>Coords:</strong> <span id="coords">Locating...</span></span>
@@ -373,10 +379,8 @@
           localStorage.setItem('swachhify-theme', 'dark');
       }
       
-      // Re-render both boxes to fix colors immediately on toggle
       const liveVal = document.getElementById("aqi-display").innerText;
       const realVal = document.getElementById("real-aqi-val").innerText.replace(" US AQI", "");
-      
       if(!isNaN(parseInt(liveVal))) renderAdvice(parseInt(liveVal), "live-advice-box");
       if(!isNaN(parseInt(realVal))) renderAdvice(parseInt(realVal), "real-advice-box");
   }
@@ -445,7 +449,6 @@
       const data = await res.json();
       updateAQI(data.aqi);
     } catch (e) {
-      // Simulate random flux
       const randomAQI = Math.floor(Math.random() * (180 - 40) + 40);
       updateAQI(randomAQI);
     }
@@ -462,7 +465,6 @@
     bar.style.backgroundColor = color;
     bar.style.width = Math.min((val / 300) * 100, 100) + "%";
 
-    // Update the Live Sensor Alert Box
     renderAdvice(val, "live-advice-box");
   }
   setInterval(fetchAQI, 3500);
@@ -548,10 +550,8 @@
         const aRes = await fetch(airUrl);
         const aData = await aRes.json();
         
-        // Update Estimates Card Text
         if(aData.current && aData.current.us_aqi) {
             document.getElementById("real-aqi-val").innerText = aData.current.us_aqi + " US AQI";
-            // Update the Regional Estimate Alert Box
             renderAdvice(aData.current.us_aqi, "real-advice-box");
         }
 
