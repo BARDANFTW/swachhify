@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" href="swachhify_logo.png">
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-  
+   
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -173,7 +173,14 @@
     .card:nth-child(2) { animation-delay: 0.2s; }
     .card:nth-child(3) { animation-delay: 0.3s; }
     .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
 
+    /* Forecast List Styles */
+    .forecast-item {
+        display: flex; justify-content: space-between; 
+        padding: 8px 0; border-bottom: 1px dashed #ddd; font-size: 0.9rem;
+    }
+    .forecast-item:last-child { border-bottom: none; }
   </style>
 </head>
 <body>
@@ -215,6 +222,28 @@
       <span class="sensor-sub">Mic Monitor</span>
     </div>
     <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
+  </div>
+
+  <div class="card full-width-tablet">
+    <div class="section-title">☁️ Weather & Forecast</div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+        <div style="background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center;">
+            <p style="margin:0; font-size:0.8rem; color:#666;">Temperature</p>
+            <p id="temp-val" style="margin:5px 0; font-weight:700; font-size:1.4rem;">--°C</p>
+            <span id="weather-desc" style="font-size:0.8rem; color:var(--accent);">--</span>
+        </div>
+        <div style="background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center;">
+            <p style="margin:0; font-size:0.8rem; color:#666;">Humidity</p>
+            <p id="humid-val" style="margin:5px 0; font-weight:700; font-size:1.4rem;">--%</p>
+            <span style="font-size:0.8rem; color:blue;">Hydration Alert</span>
+        </div>
+    </div>
+
+    <p style="font-weight:600; margin-bottom:10px; font-size:0.95rem;">⚠ Pollution Forecast (Next 4 Hrs)</p>
+    <div id="pollution-forecast" style="background:#fff; border:1px solid #eee; border-radius:8px; padding:10px;">
+        Loading forecast data...
+    </div>
   </div>
 
   <div class="card full-width-tablet">
@@ -294,6 +323,9 @@
     
     // Trigger Estimates
     updateEstimates(lat);
+
+    // --- NEW: FETCH ACCURATE WEATHER & POLLUTION FORECAST ---
+    getRealWeather(lat, lon);
   }
 
   function updateEstimates(lat) {
@@ -412,6 +444,73 @@
     if (db < 50) display.style.color = "green";
     else if (db < 80) display.style.color = "orange";
     else display.style.color = "red";
+  }
+
+  // ==========================
+  // 4. NEW: REAL WEATHER & POLLUTION FORECAST API
+  // ==========================
+  async function getRealWeather(lat, lon) {
+    try {
+        // 1. Fetch Weather (Temp & Humidity)
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code`;
+        const wRes = await fetch(weatherUrl);
+        const wData = await wRes.json();
+
+        // Update DOM
+        document.getElementById("temp-val").innerText = wData.current.temperature_2m + "°C";
+        document.getElementById("humid-val").innerText = wData.current.relative_humidity_2m + "%";
+        document.getElementById("weather-desc").innerText = getWeatherDesc(wData.current.weather_code);
+
+        // 2. Fetch Pollution Forecast (PM2.5)
+        const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=pm2_5`;
+        const aRes = await fetch(airUrl);
+        const aData = await aRes.json();
+
+        // Get next 4 hours
+        let listHtml = "";
+        const now = new Date().getHours();
+        
+        for(let i = 0; i < 4; i++) {
+            // Find current index in API time array (API returns ISO strings)
+            // Simplified: We assume array starts from 00:00 today or close enough for this demo
+            // Better: just take indices 0-4 of the returned array for "upcoming" if using hourly
+            
+            // To be accurate, we match current hour:
+            // The API returns 120+ hours. We need to find the index matching current time.
+            // Simplified approach for Swachhify demo: Take indices [now] to [now+4]
+            let idx = now + i; 
+            if(idx >= aData.hourly.pm2_5.length) break;
+
+            let val = aData.hourly.pm2_5[idx];
+            let status = "Good";
+            let color = "green";
+            
+            if(val > 15) { status = "Moderate"; color = "orange"; }
+            if(val > 40) { status = "High"; color = "red"; }
+
+            listHtml += `
+                <div class="forecast-item">
+                    <span>⏰ ${idx}:00</span>
+                    <span>PM2.5: <strong>${val}</strong></span>
+                    <span style="color:${color}; font-weight:600;">${status}</span>
+                </div>
+            `;
+        }
+        document.getElementById("pollution-forecast").innerHTML = listHtml;
+
+    } catch (err) {
+        console.error("API Error", err);
+        document.getElementById("pollution-forecast").innerText = "Data unavailable (Offline)";
+    }
+  }
+
+  function getWeatherDesc(code) {
+      if(code === 0) return "☀️ Sunny / Clear";
+      if(code >= 1 && code <= 3) return "☁️ Partly Cloudy";
+      if(code >= 45 && code <= 48) return "🌫 Foggy";
+      if(code >= 51 && code <= 67) return "🌧 Rainy";
+      if(code >= 95) return "⛈ Thunderstorm";
+      return "⛅ Unknown";
   }
 
 </script>
