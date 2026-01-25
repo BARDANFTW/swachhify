@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -115,6 +116,7 @@
     @media (min-width: 992px) {
       .dashboard { grid-template-columns: 2fr 1fr 1fr; }
       .col-span-2 { grid-column: span 2; }
+      /* Desktop Map is compact (1 row) */
     }
     @media (min-width: 600px) and (max-width: 991px) {
       .dashboard { grid-template-columns: 1fr 1fr; }
@@ -139,26 +141,6 @@
 
     @media (hover: hover) {
       .card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
-    }
-
-    /* INTERACTIVE CARD */
-    .card-interactive {
-        cursor: pointer;
-        position: relative;
-    }
-    .card-interactive:active {
-        transform: scale(0.98);
-    }
-    .click-hint {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        font-size: 0.8rem;
-        opacity: 0.5;
-        border: 1px solid var(--accent);
-        padding: 2px 6px;
-        border-radius: 4px;
-        color: var(--accent);
     }
 
     .section-title {
@@ -196,7 +178,7 @@
     @media (min-width: 769px) { 
         #map { height: 100%; min-height: 300px; flex-grow: 1; } 
     }
-    /* MOBILE: Original Map Height */
+    /* MOBILE: Original Map Height (Unchanged) */
     @media (max-width: 768px) { 
         #map { height: 280px; } 
     }
@@ -251,18 +233,6 @@
 
     body[data-theme="dark"] .weather-inner-box { background-color: var(--inner-bg) !important; color: var(--dark); }
     body[data-theme="dark"] #pollution-forecast { background-color: var(--inner-bg) !important; border-color: var(--border-color) !important; color: var(--dark); }
-
-    /* New styles for hidden details */
-    #extra-weather {
-        display: none;
-        margin-top: 15px;
-        padding-top: 15px;
-        border-top: 1px dashed var(--border-color);
-        animation: fadeIn 0.4s ease;
-    }
-    .detail-row {
-        display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;
-    }
     
   </style>
 </head>
@@ -312,8 +282,7 @@
     <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
   </div>
 
-  <div class="card full-width-tablet card-interactive" onclick="toggleWeatherDetails()">
-    <span class="click-hint">Click for details</span>
+  <div class="card full-width-tablet">
     <div class="section-title">☁️ Weather & Forecast</div>
     
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
@@ -326,22 +295,6 @@
             <p style="margin:0; font-size:0.8rem; opacity:0.8;">Humidity</p>
             <p id="humid-val" style="margin:5px 0; font-weight:700; font-size:1.4rem;">--%</p>
             <span style="font-size:0.8rem; color:blue;">Hydration Alert</span>
-        </div>
-    </div>
-
-    <div id="extra-weather">
-        <p style="font-weight:600; font-size:0.9rem; color:var(--accent); margin-bottom:10px;">Detailed Atmosphere</p>
-        <div class="detail-row">
-            <span>🌡 Real Feel:</span>
-            <strong id="real-feel">--°C</strong>
-        </div>
-        <div class="detail-row">
-            <span>💨 Wind Speed:</span>
-            <strong id="wind-speed">-- km/h</strong>
-        </div>
-        <div class="detail-row">
-            <span>⏲ Pressure:</span>
-            <strong id="pressure">-- hPa</strong>
         </div>
     </div>
 
@@ -585,33 +538,14 @@
   // ==========================
   // 5. WEATHER & REAL POLLUTION
   // ==========================
-  
-  // Toggle the extra details section
-  function toggleWeatherDetails() {
-      const extraDiv = document.getElementById("extra-weather");
-      if(extraDiv.style.display === "none" || extraDiv.style.display === "") {
-          extraDiv.style.display = "block";
-      } else {
-          extraDiv.style.display = "none";
-      }
-  }
-
   async function getRealWeather(lat, lon) {
     try {
-        // Updated API call to include: apparent_temperature, surface_pressure, wind_speed_10m
-        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,apparent_temperature,surface_pressure,wind_speed_10m`;
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code`;
         const wRes = await fetch(weatherUrl);
         const wData = await wRes.json();
-        
-        // Basic Data
         document.getElementById("temp-val").innerText = wData.current.temperature_2m + "°C";
         document.getElementById("humid-val").innerText = wData.current.relative_humidity_2m + "%";
         document.getElementById("weather-desc").innerText = getWeatherDesc(wData.current.weather_code);
-
-        // Advanced Data (Hidden by default)
-        document.getElementById("real-feel").innerText = wData.current.apparent_temperature + "°C";
-        document.getElementById("wind-speed").innerText = wData.current.wind_speed_10m + " km/h";
-        document.getElementById("pressure").innerText = wData.current.surface_pressure + " hPa";
 
         const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi&hourly=pm2_5`;
         const aRes = await fetch(airUrl);
