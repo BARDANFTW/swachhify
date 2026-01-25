@@ -251,7 +251,7 @@
   <div class="card">
     <div class="section-title">📡 Live Sensors</div>
     
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
       <p style="margin:0 0 5px 0; font-weight:500;">Local Sensor (AQI)</p>
       <div style="display:flex; align-items:baseline; justify-content:space-between;">
         <span id="aqi-display" class="sensor-value">--</span>
@@ -260,6 +260,10 @@
       <div style="height:6px; background:#eee; border-radius:3px; margin-top:5px; overflow:hidden;">
         <div id="aqi-bar" style="width:0%; height:100%; background:#ccc; transition: width 1s;"></div>
       </div>
+    </div>
+    
+    <div id="live-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">
+        Initializing...
     </div>
 
     <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
@@ -302,7 +306,7 @@
              <span id="real-aqi-val" style="font-weight:700; font-size:1.1rem;">Loading...</span>
         </div>
         
-        <div id="health-advice" class="advice-box" style="background:#f5f5f5; color:#666;">
+        <div id="real-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">
             Waiting for GPS data...
         </div>
     </div>
@@ -369,11 +373,12 @@
           localStorage.setItem('swachhify-theme', 'dark');
       }
       
-      // Update color of alert box if data exists
-      const realAqiText = document.getElementById("real-aqi-val").innerText;
-      if(!isNaN(parseInt(realAqiText))) {
-          updateHealthAdvice(parseInt(realAqiText));
-      }
+      // Re-render both boxes to fix colors immediately on toggle
+      const liveVal = document.getElementById("aqi-display").innerText;
+      const realVal = document.getElementById("real-aqi-val").innerText.replace(" US AQI", "");
+      
+      if(!isNaN(parseInt(liveVal))) renderAdvice(parseInt(liveVal), "live-advice-box");
+      if(!isNaN(parseInt(realVal))) renderAdvice(parseInt(realVal), "real-advice-box");
   }
 
   if (localStorage.getItem('swachhify-theme') === 'dark') {
@@ -429,7 +434,7 @@
 
 
   // ==========================
-  // 2. LIVE SIMULATION (HARDWARE ONLY)
+  // 2. LIVE SIMULATION (HARDWARE)
   // ==========================
   async function fetchAQI() {
     try {
@@ -440,6 +445,7 @@
       const data = await res.json();
       updateAQI(data.aqi);
     } catch (e) {
+      // Simulate random flux
       const randomAQI = Math.floor(Math.random() * (180 - 40) + 40);
       updateAQI(randomAQI);
     }
@@ -455,18 +461,20 @@
     display.style.color = color;
     bar.style.backgroundColor = color;
     bar.style.width = Math.min((val / 300) * 100, 100) + "%";
+
+    // Update the Live Sensor Alert Box
+    renderAdvice(val, "live-advice-box");
   }
   setInterval(fetchAQI, 3500);
 
   // ==========================
-  // 3. DYNAMIC HEALTH ADVICE LOGIC
+  // 3. UNIVERSAL ADVICE RENDERER
   // ==========================
-  function updateHealthAdvice(val) {
-    const box = document.getElementById("health-advice");
-    const isDark = document.body.getAttribute('data-theme') === 'dark';
+  function renderAdvice(val, elementId) {
+    const box = document.getElementById(elementId);
+    if(!box) return;
 
-    // Show the numeric value in the text
-    document.getElementById("real-aqi-val").innerText = val + " US AQI";
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
 
     if (val <= 50) {
         box.style.background = isDark ? "rgba(76, 175, 80, 0.15)" : "#e8f5e9";
@@ -529,7 +537,6 @@
   // ==========================
   async function getRealWeather(lat, lon) {
     try {
-        // Fetch Weather
         const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code`;
         const wRes = await fetch(weatherUrl);
         const wData = await wRes.json();
@@ -537,17 +544,17 @@
         document.getElementById("humid-val").innerText = wData.current.relative_humidity_2m + "%";
         document.getElementById("weather-desc").innerText = getWeatherDesc(wData.current.weather_code);
 
-        // Fetch Air Quality (Real Data) including US AQI
         const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi&hourly=pm2_5`;
         const aRes = await fetch(airUrl);
         const aData = await aRes.json();
         
-        // --- THIS IS WHERE WE UPDATE THE ESTIMATES CARD ---
+        // Update Estimates Card Text
         if(aData.current && aData.current.us_aqi) {
-            updateHealthAdvice(aData.current.us_aqi);
+            document.getElementById("real-aqi-val").innerText = aData.current.us_aqi + " US AQI";
+            // Update the Regional Estimate Alert Box
+            renderAdvice(aData.current.us_aqi, "real-advice-box");
         }
 
-        // Fill Forecast List
         let listHtml = "";
         const now = new Date().getHours();
         for(let i = 0; i < 4; i++) {
@@ -563,7 +570,6 @@
         document.getElementById("pollution-forecast").innerHTML = listHtml;
     } catch (err) {
         document.getElementById("pollution-forecast").innerText = "Data unavailable (Offline)";
-        document.getElementById("health-advice").innerText = "Could not fetch regional data.";
     }
   }
 
