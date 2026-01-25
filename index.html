@@ -225,7 +225,7 @@
 
     .forecast-item {
         display: grid; 
-        grid-template-columns: 1fr 1.2fr 1fr; /* 3 Columns: Time | Weather | Pollution */
+        grid-template-columns: 1fr 1.2fr 1fr;
         align-items: center;
         padding: 8px 0; 
         border-bottom: 1px dashed var(--border-color); 
@@ -333,6 +333,19 @@
       </div>
     </div>
     <p style="font-size:0.75rem; color:#888; margin-top:15px; font-style:italic;">*Estimates based on GPS lat/long data.</p>
+  </div>
+
+  <div class="card full-width-tablet">
+    <div class="section-title">🌌 Bortle Scale</div>
+    <table>
+      <thead><tr><th>Class</th><th>Sky Quality</th></tr></thead>
+      <tbody>
+        <tr><td>1 – 2</td><td>Excellent Dark Sky</td></tr>
+        <tr><td>3 – 4</td><td>Rural / Transition</td></tr>
+        <tr><td>5 – 6</td><td>Bright Suburban</td></tr>
+        <tr><td style="color:red; font-weight:bold;">7 – 9</td><td>Inner City / Bright</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="card full-width-tablet">
@@ -542,17 +555,14 @@
   // ==========================
   async function getRealWeather(lat, lon) {
     try {
-        // Fetch Current Weather AND Hourly Forecast
         const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code&hourly=temperature_2m,weather_code`;
         const wRes = await fetch(weatherUrl);
         const wData = await wRes.json();
         
-        // Update Top Box
         document.getElementById("temp-val").innerText = wData.current.temperature_2m + "°C";
         document.getElementById("humid-val").innerText = wData.current.relative_humidity_2m + "%";
         document.getElementById("weather-desc").innerText = getWeatherDesc(wData.current.weather_code);
 
-        // Fetch Pollution Data
         const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi&hourly=pm2_5`;
         const aRes = await fetch(airUrl);
         const aData = await aRes.json();
@@ -562,24 +572,16 @@
             renderAdvice(aData.current.us_aqi, "real-advice-box");
         }
 
-        // Build Combined Hourly Forecast (Weather + Pollution)
         let listHtml = "";
         const now = new Date().getHours();
-        
-        // Loop for next 4 hours
         for(let i = 0; i < 4; i++) {
             let idx = now + i;
-            
-            // Safety check for data availability
             if(idx >= aData.hourly.pm2_5.length || idx >= wData.hourly.temperature_2m.length) break;
             
-            // Data points
             let pmVal = aData.hourly.pm2_5[idx];
             let tempVal = wData.hourly.temperature_2m[idx];
             let wCode = wData.hourly.weather_code[idx];
             let wIcon = getWeatherIcon(wCode);
-
-            // Coloring logic for PM2.5
             let status = "Good";
             let color = "green";
             if(pmVal > 15) { status = "Mod."; color = "orange"; }
@@ -593,9 +595,7 @@
             </div>`;
         }
         document.getElementById("combined-forecast").innerHTML = listHtml;
-
     } catch (err) {
-        console.error(err);
         document.getElementById("combined-forecast").innerText = "Data unavailable (Offline)";
     }
   }
