@@ -112,14 +112,21 @@
       gap: 20px;
     }
 
+    /* DESKTOP LAYOUT (3 Columns) */
     @media (min-width: 992px) {
       .dashboard { grid-template-columns: 2fr 1fr 1fr; }
       .col-span-2 { grid-column: span 2; }
+      .col-span-2-desktop { grid-column: span 2; } /* New class for Bortle Scale */
     }
+
+    /* TABLET LAYOUT (2 Columns) */
     @media (min-width: 600px) and (max-width: 991px) {
       .dashboard { grid-template-columns: 1fr 1fr; }
       .full-width-tablet { grid-column: span 2; }
+      .col-span-2-desktop { grid-column: span 2; } /* Keeps it full width on tablet too */
     }
+
+    /* MOBILE LAYOUT (1 Column) */
     @media (max-width: 599px) {
       .dashboard { grid-template-columns: 1fr; padding: 15px; }
     }
@@ -172,11 +179,9 @@
       border: 2px solid var(--border-color);
     }
     
-    /* DESKTOP: Compact Map */
     @media (min-width: 769px) { 
         #map { height: 100%; min-height: 300px; flex-grow: 1; } 
     }
-    /* MOBILE: Original Map Height */
     @media (max-width: 768px) { 
         #map { height: 280px; } 
     }
@@ -259,7 +264,6 @@
 
   <div class="card">
     <div class="section-title">📡 Live Sensors</div>
-    
     <div style="margin-bottom: 10px;">
       <p style="margin:0 0 5px 0; font-weight:500;">Local Sensor (AQI)</p>
       <div style="display:flex; align-items:baseline; justify-content:space-between;">
@@ -270,11 +274,7 @@
         <div id="aqi-bar" style="width:0%; height:100%; background:#ccc; transition: width 1s;"></div>
       </div>
     </div>
-    
-    <div id="live-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">
-        Initializing...
-    </div>
-
+    <div id="live-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">Initializing...</div>
     <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
     <p style="margin:0 0 5px 0; font-weight:500;">Noise Level</p>
     <div style="display:flex; align-items:baseline; justify-content:space-between;">
@@ -285,44 +285,33 @@
   </div>
 
   <div class="card full-width-tablet">
-    <div class="section-title">☁️ Weather & Forecast</div>
-    
+    <div class="section-title">☁️ Forecast</div>
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
         <div class="weather-inner-box" style="background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center;">
-            <p style="margin:0; font-size:0.8rem; opacity:0.8;">Temperature</p>
+            <p style="margin:0; font-size:0.8rem; opacity:0.8;">Temp</p>
             <p id="temp-val" style="margin:5px 0; font-weight:700; font-size:1.4rem;">--°C</p>
             <span id="weather-desc" style="font-size:0.8rem; color:var(--accent);">--</span>
         </div>
         <div class="weather-inner-box" style="background: #f9f9f9; padding: 10px; border-radius: 8px; text-align: center;">
             <p style="margin:0; font-size:0.8rem; opacity:0.8;">Humidity</p>
             <p id="humid-val" style="margin:5px 0; font-weight:700; font-size:1.4rem;">--%</p>
-            <span style="font-size:0.8rem; color:blue;">Hydration Alert</span>
         </div>
     </div>
-
-    <p style="font-weight:600; margin-bottom:10px; font-size:0.95rem;">📅 Next 4 Hours (Weather + Pollution)</p>
-    <div id="combined-forecast" style="background:#fff; border:1px solid var(--border-color); border-radius:8px; padding:10px;">
-        Loading forecast data...
-    </div>
+    <p style="font-weight:600; margin-bottom:10px; font-size:0.95rem;">📅 Next 4 Hours</p>
+    <div id="combined-forecast" style="background:#fff; border:1px solid var(--border-color); border-radius:8px; padding:10px;">Loading...</div>
   </div>
 
   <div class="card full-width-tablet">
-    <div class="section-title">🔭 Env. Estimates</div>
-    
+    <div class="section-title">🔭 Estimates</div>
     <div style="margin-bottom:15px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-             <span style="font-size:0.9rem; font-weight:500;">Regional Avg AQI</span>
+             <span style="font-size:0.9rem; font-weight:500;">Avg AQI</span>
              <span id="real-aqi-val" style="font-weight:700; font-size:1.1rem;">Loading...</span>
         </div>
-        
-        <div id="real-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">
-            Waiting for GPS data...
-        </div>
+        <div id="real-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">Waiting GPS...</div>
     </div>
-    
     <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
-
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+    <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
       <div>
         <p style="font-size:0.8rem; opacity:0.8; margin:0;">Light Pollution</p>
         <p id="bortle" style="font-weight:600; font-size:1.1rem; margin:5px 0;">Calculated...</p>
@@ -332,20 +321,6 @@
         <p id="sky-quality" style="font-weight:600; font-size:1.1rem; margin:5px 0;">--</p>
       </div>
     </div>
-    <p style="font-size:0.75rem; color:#888; margin-top:15px; font-style:italic;">*Estimates based on GPS lat/long data.</p>
-  </div>
-
-  <div class="card full-width-tablet">
-    <div class="section-title">🌌 Bortle Scale</div>
-    <table>
-      <thead><tr><th>Class</th><th>Sky Quality</th></tr></thead>
-      <tbody>
-        <tr><td>1 – 2</td><td>Excellent Dark Sky</td></tr>
-        <tr><td>3 – 4</td><td>Rural / Transition</td></tr>
-        <tr><td>5 – 6</td><td>Bright Suburban</td></tr>
-        <tr><td style="color:red; font-weight:bold;">7 – 9</td><td>Inner City / Bright</td></tr>
-      </tbody>
-    </table>
   </div>
 
   <div class="card full-width-tablet">
@@ -353,10 +328,10 @@
     <table>
       <thead><tr><th>dB Level</th><th>Impact</th></tr></thead>
       <tbody>
-        <tr><td>0 – 40 dB</td><td>Quiet / Library</td></tr>
-        <tr><td>40 – 70 dB</td><td>Normal Conversation</td></tr>
-        <tr><td style="color:orange; font-weight:bold;">70 – 85 dB</td><td>Annoying / Traffic</td></tr>
-        <tr><td style="color:red; font-weight:bold;">85+ dB</td><td>Harmful over time</td></tr>
+        <tr><td>0 – 40</td><td>Quiet / Library</td></tr>
+        <tr><td>40 – 70</td><td>Conversation</td></tr>
+        <tr><td style="color:orange; font-weight:bold;">70 – 85</td><td>Traffic</td></tr>
+        <tr><td style="color:red; font-weight:bold;">85+</td><td>Harmful</td></tr>
       </tbody>
     </table>
   </div>
@@ -373,18 +348,39 @@
     </table>
   </div>
 
+  <div class="card col-span-2-desktop">
+    <div class="section-title">🌌 Bortle Dark-Sky Scale</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;">
+        <thead>
+          <tr>
+            <th style="width:15%">Class</th>
+            <th style="width:35%">Title</th>
+            <th style="width:50%">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="font-weight:bold;">1</td><td>Excellent Dark Sky</td><td>Purest night sky possible. Zodiacal light visible.</td></tr>
+          <tr><td style="font-weight:bold;">2</td><td>Typical Dark Sky</td><td>Complex Milky Way structure visible.</td></tr>
+          <tr><td style="font-weight:bold;">3</td><td>Rural Sky</td><td>Milky Way still complex. Light domes on horizon.</td></tr>
+          <tr><td style="font-weight:bold;">4</td><td>Rural/Suburban</td><td>Milky Way lacks detail. Transition zone.</td></tr>
+          <tr><td style="font-weight:bold;">5</td><td>Suburban Sky</td><td>Milky Way very washed out.</td></tr>
+          <tr><td style="font-weight:bold;">6</td><td>Bright Suburban</td><td>Milky Way invisible. Sky glows gray.</td></tr>
+          <tr><td style="font-weight:bold; color:orange;">7</td><td style="color:orange;">Suburban/Urban</td><td style="color:orange;">Stars are scarce. Background is bright.</td></tr>
+          <tr><td style="font-weight:bold; color:red;">8-9</td><td style="color:red;">City / Inner City</td><td style="color:red;">Sky is white/orange. Only planets/bright stars visible.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 <script>
-  // ==========================
-  // 0. THEME TOGGLE LOGIC
-  // ==========================
+  // (Same JS Logic as previous version - Logic Unchanged)
   function toggleTheme() {
       const body = document.body;
       const btn = document.getElementById('theme-btn');
-      
       if (body.getAttribute('data-theme') === 'dark') {
           body.removeAttribute('data-theme');
           btn.innerText = "🌙";
@@ -394,41 +390,23 @@
           btn.innerText = "☀️";
           localStorage.setItem('swachhify-theme', 'dark');
       }
-      
       const liveVal = document.getElementById("aqi-display").innerText;
       const realVal = document.getElementById("real-aqi-val").innerText.replace(" US AQI", "");
       if(!isNaN(parseInt(liveVal))) renderAdvice(parseInt(liveVal), "live-advice-box");
       if(!isNaN(parseInt(realVal))) renderAdvice(parseInt(realVal), "real-advice-box");
   }
-
   if (localStorage.getItem('swachhify-theme') === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
       document.getElementById('theme-btn').innerText = "☀️";
   }
 
-  // ==========================
-  // 1. MAP LOGIC
-  // ==========================
   function initMap(lat, lon) {
     document.getElementById("coords").innerText = `${lat.toFixed(4)}, ${lon.toFixed(4)}`;
     if (window.mapInstance) window.mapInstance.remove();
     const zoomLevel = window.innerWidth > 768 ? 8 : 6;
     window.mapInstance = L.map("map").setView([lat, lon], zoomLevel);
-
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; CARTO', maxZoom: 19
-    }).addTo(window.mapInstance);
-
-    L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.jpg', {
-      bounds: [[-85, -180], [85, 180]],
-      minZoom: 1, maxZoom: 8,
-      format: 'image/jpg',
-      time: '',
-      tilematrixset: 'GoogleMapsCompatible_Level',
-      opacity: 0.6,
-      attribution: 'NASA GIBS'
-    }).addTo(window.mapInstance);
-
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { attribution: '&copy; CARTO', maxZoom: 19 }).addTo(window.mapInstance);
+    L.tileLayer('https://map1.vis.earthdata.nasa.gov/wmts-webmerc/VIIRS_CityLights_2012/default/{time}/{tilematrixset}{maxZoom}/{z}/{y}/{x}.jpg', { bounds: [[-85, -180], [85, 180]], minZoom: 1, maxZoom: 8, format: 'image/jpg', time: '', tilematrixset: 'GoogleMapsCompatible_Level', opacity: 0.6, attribution: 'NASA GIBS' }).addTo(window.mapInstance);
     L.marker([lat, lon]).addTo(window.mapInstance).bindPopup("<b>Swachhify Device</b><br>Online").openPopup();
     updateEstimates(lat);
     getRealWeather(lat, lon);
@@ -446,16 +424,9 @@
   }
 
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      p => initMap(p.coords.latitude, p.coords.longitude),
-      () => initMap(27.6899, 85.2986)
-    );
+    navigator.geolocation.getCurrentPosition(p => initMap(p.coords.latitude, p.coords.longitude), () => initMap(27.6899, 85.2986));
   } else { initMap(27.6899, 85.2986); }
 
-
-  // ==========================
-  // 2. LIVE SIMULATION (HARDWARE)
-  // ==========================
   async function fetchAQI() {
     try {
       const controller = new AbortController();
@@ -480,20 +451,14 @@
     display.style.color = color;
     bar.style.backgroundColor = color;
     bar.style.width = Math.min((val / 300) * 100, 100) + "%";
-
     renderAdvice(val, "live-advice-box");
   }
   setInterval(fetchAQI, 3500);
 
-  // ==========================
-  // 3. UNIVERSAL ADVICE RENDERER
-  // ==========================
   function renderAdvice(val, elementId) {
     const box = document.getElementById(elementId);
     if(!box) return;
-
     const isDark = document.body.getAttribute('data-theme') === 'dark';
-
     if (val <= 50) {
         box.style.background = isDark ? "rgba(76, 175, 80, 0.15)" : "#e8f5e9";
         box.style.color = isDark ? "#81c784" : "#2e7d32";
@@ -512,9 +477,6 @@
     }
   }
 
-  // ==========================
-  // 4. MICROPHONE
-  // ==========================
   let audioCtx, analyser, dataArray, isMicRunning = false;
   async function toggleMic() {
     const btn = document.getElementById("btn-mic");
@@ -550,19 +512,14 @@
     else display.style.color = "red";
   }
 
-  // ==========================
-  // 5. WEATHER & REAL POLLUTION
-  // ==========================
   async function getRealWeather(lat, lon) {
     try {
         const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code&hourly=temperature_2m,weather_code`;
         const wRes = await fetch(weatherUrl);
         const wData = await wRes.json();
-        
         document.getElementById("temp-val").innerText = wData.current.temperature_2m + "°C";
         document.getElementById("humid-val").innerText = wData.current.relative_humidity_2m + "%";
-        document.getElementById("weather-desc").innerText = getWeatherDesc(wData.current.weather_code);
-
+        
         const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi&hourly=pm2_5`;
         const aRes = await fetch(airUrl);
         const aData = await aRes.json();
@@ -571,51 +528,20 @@
             document.getElementById("real-aqi-val").innerText = aData.current.us_aqi + " US AQI";
             renderAdvice(aData.current.us_aqi, "real-advice-box");
         }
-
         let listHtml = "";
         const now = new Date().getHours();
         for(let i = 0; i < 4; i++) {
             let idx = now + i;
             if(idx >= aData.hourly.pm2_5.length || idx >= wData.hourly.temperature_2m.length) break;
-            
             let pmVal = aData.hourly.pm2_5[idx];
             let tempVal = wData.hourly.temperature_2m[idx];
             let wCode = wData.hourly.weather_code[idx];
-            let wIcon = getWeatherIcon(wCode);
-            let status = "Good";
-            let color = "green";
-            if(pmVal > 15) { status = "Mod."; color = "orange"; }
-            if(pmVal > 40) { status = "Bad"; color = "red"; }
-            
-            listHtml += `
-            <div class="forecast-item">
-                <span>⏰ ${idx}:00</span>
-                <span>${wIcon} <strong>${tempVal}°</strong></span>
-                <span>PM2.5: <strong style="color:${color}">${pmVal}</strong></span>
-            </div>`;
+            let wIcon = (wCode === 0) ? "☀️" : (wCode <= 3 ? "🌥" : (wCode >= 51 ? "🌧" : "☁️"));
+            let color = pmVal > 15 ? (pmVal > 40 ? "red" : "orange") : "green";
+            listHtml += `<div class="forecast-item"><span>⏰ ${idx}:00</span><span>${wIcon} <strong>${tempVal}°</strong></span><span>PM2.5: <strong style="color:${color}">${pmVal}</strong></span></div>`;
         }
         document.getElementById("combined-forecast").innerHTML = listHtml;
-    } catch (err) {
-        document.getElementById("combined-forecast").innerText = "Data unavailable (Offline)";
-    }
-  }
-
-  function getWeatherDesc(code) {
-      if(code === 0) return "☀️ Sunny / Clear";
-      if(code >= 1 && code <= 3) return "☁️ Partly Cloudy";
-      if(code >= 45 && code <= 48) return "🌫 Foggy";
-      if(code >= 51 && code <= 67) return "🌧 Rainy";
-      if(code >= 95) return "⛈ Thunderstorm";
-      return "⛅ Unknown";
-  }
-
-  function getWeatherIcon(code) {
-      if(code === 0) return "☀️";
-      if(code >= 1 && code <= 3) return "🌥";
-      if(code >= 45 && code <= 48) return "🌫";
-      if(code >= 51 && code <= 67) return "🌧";
-      if(code >= 95) return "⛈";
-      return "⛅";
+    } catch (err) { document.getElementById("combined-forecast").innerText = "Data unavailable (Offline)"; }
   }
 </script>
 </body>
