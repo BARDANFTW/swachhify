@@ -26,13 +26,13 @@
 
     /* --- DARK MODE VARIABLES --- */
     body[data-theme="dark"] {
-      --primary: #121212;         /* Main Background */
-      --accent: #B6D83D;          /* Accent becomes the bright green */
-      --dark: #e0e0e0;            /* Text becomes white/grey */
-      --card-bg: #1e1e1e;         /* Cards become dark grey */
+      --primary: #121212;         
+      --accent: #B6D83D;          
+      --dark: #e0e0e0;            
+      --card-bg: #1e1e1e;         
       --shadow: 0 4px 12px rgba(0,0,0,0.5);
-      --border-color: #333;       /* Darker borders */
-      --inner-bg: #2d2d2d;        /* Inner widgets background */
+      --border-color: #333;       
+      --inner-bg: #2d2d2d;        
     }
 
     * { box-sizing: border-box; }
@@ -52,7 +52,7 @@
     header {
       padding: 20px 15px;
       text-align: center;
-      background: var(--primary); /* Uses variable now */
+      background: var(--primary);
       animation: slideDown 0.8s ease-out;
       position: relative;
       transition: background 0.3s ease;
@@ -93,7 +93,7 @@
 
     .slogan {
       font-weight: 700;
-      color: white; /* Keep white in light mode, override in dark */
+      color: white;
       text-transform: uppercase;
       margin: 0;
       opacity: 0;
@@ -105,7 +105,7 @@
     @media (min-width: 769px) {
       .slogan { font-size: 24px; letter-spacing: 18px; }
     }
-    /* Mobile Slogan Style (Compressed to fit screen) */
+    /* Mobile Slogan Style */
     @media (max-width: 768px) {
       .slogan { font-size: 18px; letter-spacing: 4px; }
       header img { height: 100px; width: 100px; }
@@ -133,7 +133,7 @@
       .full-width-tablet { grid-column: span 2; }
     }
 
-    /* Mobile Layout: 1 Column (Default) */
+    /* Mobile Layout: 1 Column */
     @media (max-width: 599px) {
       .dashboard { grid-template-columns: 1fr; padding: 15px; }
     }
@@ -149,11 +149,8 @@
       animation: fadeInUp 0.6s ease-out forwards;
       opacity: 0;
     }
-    
-    /* Dark Mode Border Fix */
     body[data-theme="dark"] .card { border: 1px solid #333; }
 
-    /* Hover effect only on devices that support hover (PC) */
     @media (hover: hover) {
       .card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
     }
@@ -169,6 +166,18 @@
       padding-left: 10px;
     }
 
+    /* NEW: Health Advice Box Style */
+    .advice-box {
+        padding: 12px;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.5s ease;
+        text-align: center;
+        border: 1px solid transparent;
+    }
+
     /* --- 5. MAP --- */
     #map {
       width: 100%;
@@ -177,13 +186,8 @@
       border: 2px solid var(--border-color);
     }
     
-    /* Responsive Map Height (Fixed from previous turn) */
     @media (min-width: 769px) { 
-        #map { 
-            height: 100%;       
-            min-height: 400px; 
-            flex-grow: 1;       
-        } 
+        #map { height: 100%; min-height: 400px; flex-grow: 1; } 
     }
     @media (max-width: 768px) { #map { height: 280px; } }
 
@@ -207,7 +211,7 @@
       transition: all 0.2s active;
       margin-top: 10px;
     }
-    body[data-theme="dark"] .mic-btn { color: #121212; } /* Contrast fix */
+    body[data-theme="dark"] .mic-btn { color: #121212; }
     .mic-btn:active { transform: scale(0.96); }
     .mic-btn.pulsing { background: #d32f2f; animation: pulse 1.5s infinite; }
 
@@ -238,17 +242,9 @@
     }
     .forecast-item:last-child { border-bottom: none; }
 
-    /* Helper for inner boxes in dark mode (overrides inline styles) */
-    body[data-theme="dark"] .weather-inner-box {
-        background-color: var(--inner-bg) !important;
-        color: var(--dark);
-    }
-    /* Override for Pollution Forecast box */
-    body[data-theme="dark"] #pollution-forecast {
-        background-color: var(--inner-bg) !important;
-        border-color: var(--border-color) !important;
-        color: var(--dark);
-    }
+    /* Dark mode helpers */
+    body[data-theme="dark"] .weather-inner-box { background-color: var(--inner-bg) !important; color: var(--dark); }
+    body[data-theme="dark"] #pollution-forecast { background-color: var(--inner-bg) !important; border-color: var(--border-color) !important; color: var(--dark); }
     
   </style>
 </head>
@@ -256,7 +252,6 @@
 
 <header>
   <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">🌙</button>
-
   <img src="swachhify_logo.png" alt="Swachhify" onerror="this.style.display='none'">
   <h1 class="slogan">SENSE MORE LIVE BETTER</h1>
 </header>
@@ -275,7 +270,7 @@
   <div class="card">
     <div class="section-title">📡 Live Sensors</div>
     
-    <div style="margin-bottom: 20px;">
+    <div style="margin-bottom: 10px;">
       <p style="margin:0 0 5px 0; font-weight:500;">Air Quality (AQI)</p>
       <div style="display:flex; align-items:baseline; justify-content:space-between;">
         <span id="aqi-display" class="sensor-value">--</span>
@@ -284,6 +279,10 @@
       <div style="height:6px; background:#eee; border-radius:3px; margin-top:5px; overflow:hidden;">
         <div id="aqi-bar" style="width:0%; height:100%; background:#ccc; transition: width 1s;"></div>
       </div>
+    </div>
+
+    <div id="health-advice" class="advice-box" style="background:#e8f5e9; color:#2e7d32;">
+        Initializing sensor data...
     </div>
 
     <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
@@ -369,7 +368,6 @@
       const body = document.body;
       const btn = document.getElementById('theme-btn');
       
-      // Toggle logic
       if (body.getAttribute('data-theme') === 'dark') {
           body.removeAttribute('data-theme');
           btn.innerText = "🌙";
@@ -379,9 +377,11 @@
           btn.innerText = "☀️";
           localStorage.setItem('swachhify-theme', 'dark');
       }
+      // Re-trigger alert update to fix text colors if needed
+      const aqiText = document.getElementById("aqi-display").innerText;
+      if(aqiText !== "--") updateHealthAdvice(parseInt(aqiText));
   }
 
-  // Load Saved Theme on Start
   if (localStorage.getItem('swachhify-theme') === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
       document.getElementById('theme-btn').innerText = "☀️";
@@ -435,7 +435,7 @@
 
 
   // ==========================
-  // 2. AQI SIMULATION
+  // 2. AQI & HEALTH LOGIC
   // ==========================
   async function fetchAQI() {
     try {
@@ -461,9 +461,35 @@
     display.style.color = color;
     bar.style.backgroundColor = color;
     bar.style.width = Math.min((val / 300) * 100, 100) + "%";
-  }
-  setInterval(fetchAQI, 3500);
 
+    // Trigger Health Advice Update
+    updateHealthAdvice(val);
+  }
+  
+  // NEW: Update Alert Box based on AQI and Dark Mode
+  function updateHealthAdvice(val) {
+    const box = document.getElementById("health-advice");
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+
+    if (val <= 50) {
+        box.style.background = isDark ? "rgba(76, 175, 80, 0.15)" : "#e8f5e9";
+        box.style.color = isDark ? "#81c784" : "#2e7d32";
+        box.style.borderColor = isDark ? "#2e7d32" : "transparent";
+        box.innerHTML = "✅ <strong>Good Air:</strong> Great time for outdoor activities!";
+    } else if (val <= 150) {
+        box.style.background = isDark ? "rgba(255, 152, 0, 0.15)" : "#fff3e0";
+        box.style.color = isDark ? "#ffb74d" : "#e65100";
+        box.style.borderColor = isDark ? "#e65100" : "transparent";
+        box.innerHTML = "⚠ <strong>Moderate:</strong> Sensitive groups should wear masks.";
+    } else {
+        box.style.background = isDark ? "rgba(244, 67, 54, 0.15)" : "#ffebee";
+        box.style.color = isDark ? "#e57373" : "#c62828";
+        box.style.borderColor = isDark ? "#c62828" : "transparent";
+        box.innerHTML = "⛔ <strong>DANGER:</strong> Close windows & avoid outdoors.";
+    }
+  }
+
+  setInterval(fetchAQI, 3500);
 
   // ==========================
   // 3. MICROPHONE
