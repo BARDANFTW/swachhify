@@ -178,7 +178,7 @@
       border-radius: 12px;
       border: 2px solid var(--border-color);
     }
-     
+      
     @media (min-width: 769px) { 
         #map { height: 100%; min-height: 300px; flex-grow: 1; } 
     }
@@ -238,28 +238,51 @@
     .mic-btn:active { transform: scale(0.96); }
     .mic-btn.pulsing { background: #d32f2f; animation: pulse 1.5s infinite; }
 
-    /* --- 7. TABLES & UTILS --- */
+    /* --- 7. TABLES & EXPANSION (FIXED) --- */
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    th, td { padding: 10px; border-bottom: 1px solid var(--border-color); text-align: left; transition: background 0.2s; }
+    th, td { padding: 12px 10px; border-bottom: 1px solid var(--border-color); text-align: left; }
     th { color: var(--accent); font-weight: 600; border-bottom: 2px solid var(--accent); }
-    tr:last-child td { border-bottom: none; }
     
-    /* Table Row Hover Animation */
-    tr:hover td {
-        background-color: rgba(182, 216, 61, 0.1);
-        padding-left: 15px; /* Slight slide effect */
+    /* Clickable Rows */
+    .expandable-row { 
+        cursor: pointer; 
+        transition: background-color 0.2s; 
     }
-    body[data-theme="dark"] tr:hover td { background-color: rgba(255,255,255,0.05); }
+    
+    /* FIXED: No padding change to prevent jerking */
+    .expandable-row:hover { 
+        background-color: rgba(182, 216, 61, 0.15); 
+    }
+    body[data-theme="dark"] .expandable-row:hover { background-color: rgba(255,255,255,0.05); }
+
+    /* Hidden Details Row */
+    .details-row { 
+        display: none; 
+        background: rgba(0,0,0,0.02); 
+    }
+    body[data-theme="dark"] .details-row { background: rgba(255,255,255,0.03); }
+    
+    .details-row.show { 
+        display: table-row; 
+        animation: fadeInRow 0.3s ease; 
+    }
+    
+    .details-content { padding: 10px; font-size: 0.8rem; line-height: 1.5; color: #555; }
+    body[data-theme="dark"] .details-content { color: #bbb; }
+    
+    .toggle-icon { display: inline-block; width: 15px; transition: transform 0.3s; }
+    .expandable-row.active .toggle-icon { transform: rotate(90deg); }
 
     .table-container {
         overflow-x: auto;
-        max-height: 300px;
+        max-height: 350px; 
         overflow-y: auto;
     }
 
     /* --- 8. ANIMATION KEYFRAMES --- */
     @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
     @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInRow { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.5); } 70% { box-shadow: 0 0 0 12px rgba(211, 47, 47, 0); } 100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); } }
     @keyframes fadeIn { to { opacity: 1; } }
@@ -296,7 +319,7 @@
 
     body[data-theme="dark"] .weather-inner-box { background-color: var(--inner-bg) !important; color: var(--dark); }
     body[data-theme="dark"] #combined-forecast { background-color: var(--inner-bg) !important; border-color: var(--border-color) !important; color: var(--dark); }
-     
+      
   </style>
 </head>
 <body>
@@ -380,36 +403,118 @@
   </div>
 
   <div class="card full-width-tablet">
-    <div class="section-title">📊 Health Guide</div>
+    <div class="section-title">📊 Health Guide <span style="font-size:0.7rem; font-weight:400; color:#888;">(Tap to expand)</span></div>
     <div class="table-container">
       <table>
-        <thead><tr><th>dB</th><th>Example</th><th>Risk</th></tr></thead>
+        <thead><tr><th>Range</th><th>Source</th><th>Risk</th></tr></thead>
         <tbody>
-          <tr><td>10-30</td><td>Whisper / Leaves</td><td>Safe</td></tr>
-          <tr><td>40-50</td><td>Quiet Room</td><td>Safe</td></tr>
-          <tr><td>60</td><td>Conversation</td><td>Safe</td></tr>
-          <tr><td>70-80</td><td>Traffic / Vacuum</td><td>Annoying</td></tr>
-          <tr><td style="color:orange; font-weight:bold;">85-90</td><td>Lawn Mower</td><td>Risk (8hrs)</td></tr>
-          <tr><td style="color:red; font-weight:bold;">100-110</td><td>Concert / Horn</td><td>High Risk</td></tr>
-          <tr><td style="color:#d32f2f; font-weight:bold;">120+</td><td>Jet / Gunshot</td><td>Pain/Damage</td></tr>
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 10-30</td><td>Whisper / Leaves</td><td>Safe</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Barely audible. Great for sleep.<br><strong>Action:</strong> Relax.
+          </div></td></tr>
+          
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 40-50</td><td>Quiet Room</td><td>Safe</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Comfortable environment.<br><strong>Action:</strong> Ideal for concentration/study.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 60</td><td>Conversation</td><td>Safe</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Normal human interaction.<br><strong>Action:</strong> None required.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 70-80</td><td>Traffic / Vacuum</td><td>Annoying</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Intrusive noise. May cause stress.<br><strong>Action:</strong> Close windows if possible.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 85-90</td><td>Lawn Mower</td><td style="color:orange; font-weight:bold;">Risk</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Damage possible after 8 hours.<br><strong>Action:</strong> Wear earplugs.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 100-110</td><td>Concert / Horn</td><td style="color:red; font-weight:bold;">High Risk</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Hearing loss possible in < 15 mins.<br><strong>Action:</strong> Use protection or leave.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 120+</td><td>Jet / Gunshot</td><td style="color:#d32f2f; font-weight:bold;">Pain/Damage</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Immediate pain or injury.<br><strong>Action:</strong> Move away immediately.
+          </div></td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <div class="card full-width-tablet">
-    <div class="section-title">🧪 pH Guide</div>
+    <div class="section-title">🧪 pH Guide <span style="font-size:0.7rem; font-weight:400; color:#888;">(Tap to expand)</span></div>
     <div class="table-container">
       <table>
         <thead><tr><th>pH</th><th>Example</th><th>Type</th></tr></thead>
         <tbody>
-          <tr><td style="color:red; font-weight:bold;">0-2</td><td>Battery Acid</td><td>Strong Acid</td></tr>
-          <tr><td style="color:orange;">3-4</td><td>Acid Rain / Soda</td><td>Acidic</td></tr>
-          <tr><td style="color:#bcbc03;">5-6</td><td>Coffee / Skin</td><td>Mild Acid</td></tr>
-          <tr><td style="color:green; font-weight:bold;">7</td><td>Pure Water</td><td>Neutral</td></tr>
-          <tr><td style="color:#bcbc03;">8-9</td><td>Baking Soda</td><td>Alkaline</td></tr>
-          <tr><td style="color:blue;">10-12</td><td>Soapy Water</td><td>High Alk</td></tr>
-          <tr><td style="color:purple; font-weight:bold;">13-14</td><td>Bleach / Lye</td><td>Toxic</td></tr>
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 0-2</td><td>Battery Acid</td><td style="color:red; font-weight:bold;">Strong Acid</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Highly corrosive. Kills life.<br><strong>Action:</strong> Neutralize immediately.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 3-4</td><td>Acid Rain/Soda</td><td style="color:orange;">Acidic</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Harmful to plants/teeth.<br><strong>Action:</strong> Limit exposure.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 5-6</td><td>Coffee / Skin</td><td style="color:#bcbc03;">Mild Acid</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Safe range for consumption.<br><strong>Action:</strong> No action needed.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 7</td><td>Pure Water</td><td style="color:green; font-weight:bold;">Neutral</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Perfect balance.<br><strong>Action:</strong> Drinkable (if clean).
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 8-9</td><td>Baking Soda</td><td style="color:#bcbc03;">Alkaline</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Mild base. Bitter taste.<br><strong>Action:</strong> Used for cleaning/baking.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 10-12</td><td>Soapy Water</td><td style="color:blue;">High Alk</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Irritant to skin/eyes.<br><strong>Action:</strong> Rinse if contacted.
+          </div></td></tr>
+
+          <tr class="expandable-row" onclick="toggleRow(this)">
+            <td><span class="toggle-icon">▶</span> 13-14</td><td>Bleach / Lye</td><td style="color:purple; font-weight:bold;">Toxic</td>
+          </tr>
+          <tr class="details-row"><td colspan="3"><div class="details-content">
+             <strong>Effect:</strong> Caustic chemical burns.<br><strong>Action:</strong> Do not touch.
+          </div></td></tr>
         </tbody>
       </table>
     </div>
@@ -444,7 +549,16 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  // --- UTILITY: Number Count-Up Animation ---
+  // --- NEW FUNCTION: Row Expansion ---
+  function toggleRow(row) {
+    row.classList.toggle("active"); // Rotates arrow
+    var details = row.nextElementSibling;
+    if (details && details.classList.contains('details-row')) {
+        details.classList.toggle("show"); // Slides down details
+    }
+  }
+
+  // --- EXISTING LOGIC ---
   function animateValue(obj, start, end, duration, suffix = "") {
     let startTimestamp = null;
     const step = (timestamp) => {
