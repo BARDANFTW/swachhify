@@ -475,11 +475,15 @@
       // 2. Update pH (If exists)
       if (data.ph && data.ph !== "--") {
         const phVal = parseFloat(data.ph);
-        document.getElementById("live-ph").innerText = phVal.toFixed(1);
         
+        // --- 3 DECIMAL PLACES ---
+        document.getElementById("live-ph").innerText = phVal.toFixed(3);
+        
+        // Update Marker
         let phPos = Math.min((phVal / 14) * 100, 100);
         document.getElementById("ph-marker").style.left = phPos + "%";
         
+        // Update Badge
         const phBadge = document.getElementById("live-ph-badge");
         if(phVal < 6) { phBadge.innerText = "Acidic"; phBadge.style.borderColor = "red"; }
         else if(phVal > 8) { phBadge.innerText = "Alkaline"; phBadge.style.borderColor = "purple"; }
@@ -487,7 +491,7 @@
       }
 
     } catch (e) {
-      // API not ready yet, silently fail or retry
+      // API not ready yet, silently fail
     }
   }
   // Poll for data every 2 seconds
