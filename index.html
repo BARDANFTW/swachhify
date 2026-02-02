@@ -145,7 +145,7 @@
         background-size: 20px 20px; animation: stripemove 1s linear infinite;
     }
 
-    /* --- 7. TABLES (FIXED NO JERK) --- */
+    /* --- 7. TABLES --- */
     .table-container { overflow-x: auto; max-height: 350px; overflow-y: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
     th, td { padding: 12px 8px; border-bottom: 1px solid var(--border-color); text-align: left; }
@@ -240,10 +240,10 @@
     <p style="margin:0 0 5px 0; font-weight:500;">Noise Level</p>
     <div style="display:flex; align-items:baseline; justify-content:space-between;">
       <span id="live-noise" class="sensor-value" style="font-size:1.6rem;">Inactive</span>
-      <span class="sensor-sub">Mic Monitor</span>
+      <span class="sensor-sub">Sensor Data</span>
     </div>
     <canvas id="audio-visualizer"></canvas>
-    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
+    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Local Visualizer</button>
   </div>
 
   <div class="card">
@@ -458,6 +458,56 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
+  // --- REAL API LOGIC ---
+  async function fetchRealData() {
+    try {
+      // Calls your /api/data handler
+      const res = await fetch('/api/data');
+      if (!res.ok) throw new Error("API not found");
+      const data = await res.json();
+
+      // 1. Update AQI
+      if (data.aqi && data.aqi !== "--") {
+        const aqiVal = parseInt(data.aqi);
+        updateAQI(aqiVal);
+        pushAQIData(aqiVal);
+      }
+
+      // 2. Update pH
+      if (data.ph && data.ph !== "--") {
+        const phVal = parseFloat(data.ph);
+        document.getElementById("live-ph").innerText = phVal.toFixed(1);
+        
+        // Update Marker
+        let phPos = Math.min((phVal / 14) * 100, 100);
+        document.getElementById("ph-marker").style.left = phPos + "%";
+        
+        // Update Badge
+        const phBadge = document.getElementById("live-ph-badge");
+        if(phVal < 6) { phBadge.innerText = "Acidic"; phBadge.style.borderColor = "red"; }
+        else if(phVal > 8) { phBadge.innerText = "Alkaline"; phBadge.style.borderColor = "purple"; }
+        else { phBadge.innerText = "Neutral"; phBadge.style.borderColor = "green"; }
+      }
+
+      // 3. Update Noise
+      if (data.noise && data.noise !== "--") {
+        const noiseVal = parseInt(data.noise);
+        const display = document.getElementById("live-noise");
+        display.innerText = noiseVal + " dB";
+        
+        if (noiseVal < 50) display.style.color = "green";
+        else if (noiseVal < 80) display.style.color = "orange";
+        else display.style.color = "red";
+      }
+
+    } catch (e) {
+      // console.log("Waiting for data...");
+    }
+  }
+  // Poll every 2 seconds
+  setInterval(fetchRealData, 2000);
+
+  // --- UI HELPERS ---
   function toggleRow(row) {
     row.classList.toggle("active");
     var details = row.nextElementSibling;
@@ -489,8 +539,8 @@
           btn.innerText = "☀️";
           localStorage.setItem('swachhify-theme', 'dark');
       }
-      const liveVal = document.getElementById("aqi-display").innerText;
-      if(!isNaN(parseInt(liveVal))) renderAdvice(parseInt(liveVal), "live-advice-box");
+      const liveVal = parseInt(document.getElementById("aqi-display").innerText);
+      if(!isNaN(liveVal)) renderAdvice(liveVal, "live-advice-box");
   }
   if (localStorage.getItem('swachhify-theme') === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
@@ -524,7 +574,40 @@
     navigator.geolocation.getCurrentPosition(p => initMap(p.coords.latitude, p.coords.longitude), () => initMap(27.6899, 85.2986));
   } else { initMap(27.6899, 85.2986); }
 
-  // --- AUDIO ---
+  function updateAQI(val) {
+    const display = document.getElementById("aqi-display");
+    const bar = document.getElementById("aqi-bar");
+    const currentVal = parseInt(display.innerText) || 0;
+    if(currentVal !== val) animateValue(display, currentVal, val, 1000);
+    let color = "#4CAF50"; 
+    if(val > 100) color = "#FF9800"; 
+    if(val > 200) color = "#f44336"; 
+    display.style.color = color;
+    bar.style.backgroundColor = color;
+    bar.style.width = Math.min((val / 300) * 100, 100) + "%";
+    renderAdvice(val, "live-advice-box");
+  }
+
+  function renderAdvice(val, elementId) {
+    const box = document.getElementById(elementId);
+    if(!box) return;
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    if (val <= 50) {
+        box.style.background = isDark ? "rgba(76, 175, 80, 0.15)" : "#e8f5e9";
+        box.style.color = isDark ? "#81c784" : "#2e7d32";
+        box.innerHTML = "✅ <strong>Good:</strong> Safe air.";
+    } else if (val <= 150) {
+        box.style.background = isDark ? "rgba(255, 152, 0, 0.15)" : "#fff3e0";
+        box.style.color = isDark ? "#ffb74d" : "#e65100";
+        box.innerHTML = "⚠ <strong>Moderate:</strong> Mask up.";
+    } else {
+        box.style.background = isDark ? "rgba(244, 67, 54, 0.15)" : "#ffebee";
+        box.style.color = isDark ? "#e57373" : "#c62828";
+        box.innerHTML = "⛔ <strong>DANGER:</strong> Avoid outdoors.";
+    }
+  }
+
+  // --- AUDIO VISUALIZER (Local) ---
   let audioCtx, analyser, dataArray;
   let isMicRunning = false;
   const canvas = document.getElementById("audio-visualizer");
@@ -564,16 +647,6 @@
     analyser.getByteFrequencyData(dataArray);
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-    let sumSquares = 0;
-    for (let i = 0; i < dataArray.length; i++) sumSquares += dataArray[i] * dataArray[i];
-    const rms = Math.sqrt(sumSquares / dataArray.length);
-    let db = rms > 0 ? Math.round(20 * Math.log10(rms / 255) + 110) : 0;
-    
-    const display = document.getElementById("live-noise");
-    display.innerText = (db < 30 ? "< 30" : db) + " dB";
-    let val = parseInt(db) || 0;
-    display.style.color = val < 50 ? "green" : (val < 80 ? "orange" : "red");
-
     const barWidth = (canvas.width / (dataArray.length / 2));
     const centerY = canvas.height / 2;
     for(let i = 0; i < dataArray.length / 2; i++) {
@@ -582,57 +655,6 @@
         const hue = 120 - (percent * 120);
         canvasCtx.fillStyle = `hsl(${hue}, 100%, 50%)`;
         canvasCtx.fillRect(i * barWidth, centerY - (height/2), barWidth - 1, height);
-    }
-  }
-
-  // --- DATA MOCK ---
-  async function fetchAQI() {
-    try {
-      const randomAQI = Math.floor(Math.random() * (180 - 40) + 40);
-      updateAQI(randomAQI);
-      pushAQIData(randomAQI);
-      
-      const ph = (Math.random() * (9 - 6) + 6).toFixed(1);
-      document.getElementById("live-ph").innerText = ph;
-      let phPos = Math.min((ph / 14) * 100, 100);
-      document.getElementById("ph-marker").style.left = phPos + "%";
-      const phBadge = document.getElementById("live-ph-badge");
-      phBadge.innerText = ph < 6 ? "Acidic" : (ph > 8 ? "Alkaline" : "Neutral");
-      
-    } catch (e) {}
-  }
-
-  function updateAQI(val) {
-    const display = document.getElementById("aqi-display");
-    const bar = document.getElementById("aqi-bar");
-    const currentVal = parseInt(display.innerText) || 0;
-    if(currentVal !== val) animateValue(display, currentVal, val, 1000);
-    let color = "#4CAF50"; 
-    if(val > 100) color = "#FF9800"; 
-    if(val > 200) color = "#f44336"; 
-    display.style.color = color;
-    bar.style.backgroundColor = color;
-    bar.style.width = Math.min((val / 300) * 100, 100) + "%";
-    renderAdvice(val, "live-advice-box");
-  }
-  setInterval(fetchAQI, 3000);
-
-  function renderAdvice(val, elementId) {
-    const box = document.getElementById(elementId);
-    if(!box) return;
-    const isDark = document.body.getAttribute('data-theme') === 'dark';
-    if (val <= 50) {
-        box.style.background = isDark ? "rgba(76, 175, 80, 0.15)" : "#e8f5e9";
-        box.style.color = isDark ? "#81c784" : "#2e7d32";
-        box.innerHTML = "✅ <strong>Good:</strong> Safe air.";
-    } else if (val <= 150) {
-        box.style.background = isDark ? "rgba(255, 152, 0, 0.15)" : "#fff3e0";
-        box.style.color = isDark ? "#ffb74d" : "#e65100";
-        box.innerHTML = "⚠ <strong>Moderate:</strong> Mask up.";
-    } else {
-        box.style.background = isDark ? "rgba(244, 67, 54, 0.15)" : "#ffebee";
-        box.style.color = isDark ? "#e57373" : "#c62828";
-        box.innerHTML = "⛔ <strong>DANGER:</strong> Avoid outdoors.";
     }
   }
 
