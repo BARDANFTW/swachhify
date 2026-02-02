@@ -314,46 +314,90 @@
     <div style="position: relative; height: 300px; width: 100%;">
         <canvas id="aqiChart"></canvas>
     </div>
-  </div>
+    <div class="section-title">🔊 Noise Exposure Guide</div>
 
-  <div class="card">
-    <div class="section-title">📊 Health Guide <span style="font-size:0.7rem; color:#888;">(Tap row)</span></div>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Range</th><th>Risk</th></tr></thead>
-        <tbody>
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 10-30</td><td>Safe</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Barely audible. Great for sleep.<br><strong>Action:</strong> Relax.
-          </div></td></tr>
-          
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 40-50</td><td>Safe</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Quiet room environment.<br><strong>Action:</strong> Good for focus.
-          </div></td></tr>
-
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 60-70</td><td>Safe</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Normal conversation.<br><strong>Action:</strong> None required.
-          </div></td></tr>
-
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 85-90</td><td style="color:orange; font-weight:bold;">Risk</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Damage possible after 8 hours.<br><strong>Action:</strong> Wear earplugs.
-          </div></td></tr>
-
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 100-110</td><td style="color:red; font-weight:bold;">High Risk</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Hearing loss in < 15 mins.<br><strong>Action:</strong> Use protection or leave.
-          </div></td></tr>
-
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 120+</td><td style="color:#d32f2f; font-weight:bold;">Danger</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Immediate pain or injury.<br><strong>Action:</strong> Move away immediately.
-          </div></td></tr>
-        </tbody>
-      </table>
-    </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Range (dB)</th>
+              <th>Perception</th>
+              <th>Impact on You</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0 – 40</td>
+              <td>Quiet</td>
+              <td>Healthy. Ideal for sleep, recovery, and deep concentration.</td>
+            </tr>
+    
+            <tr>
+              <td>40 – 60</td>
+              <td>Moderate</td>
+              <td>Safe. Standard office or household noise. No long-term health risk.</td>
+            </tr>
+    
+            <tr>
+              <td>70 – 80</td>
+              <td>Loud</td>
+              <td>Stressful. Heavy traffic levels. Long exposure may cause hypertension and irritability.</td>
+            </tr>
+    
+            <tr>
+              <td style="color:orange; font-weight:600;">85 – 90</td>
+              <td style="color:orange; font-weight:600;">Very Loud</td>
+              <td>Harmful. Inner-ear hair cells begin to get damaged. Earplugs recommended after 2 hours.</td>
+            </tr>
+    
+            <tr>
+              <td style="color:#d32f2f; font-weight:700;">100 – 120</td>
+              <td style="color:#d32f2f; font-weight:700;">Dangerous</td>
+              <td>Critical. Risk of permanent hearing loss (Tinnitus) within ~15 minutes.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+    
+      <div class="card">
+        <div class="section-title">📊 Health Guide <span style="font-size:0.7rem; color:#888;">(Tap row)</span></div>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>Range</th><th>Risk</th></tr></thead>
+            <tbody>
+              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 10-30</td><td>Safe</td></tr>
+              <tr class="details-row"><td colspan="2"><div class="details-content">
+                 <strong>Effect:</strong> Barely audible. Great for sleep.<br><strong>Action:</strong> Relax.
+              </div></td></tr>
+              
+              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 40-50</td><td>Safe</td></tr>
+              <tr class="details-row"><td colspan="2"><div class="details-content">
+                 <strong>Effect:</strong> Quiet room environment.<br><strong>Action:</strong> Good for focus.
+              </div></td></tr>
+    
+              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 60-70</td><td>Safe</td></tr>
+              <tr class="details-row"><td colspan="2"><div class="details-content">
+                 <strong>Effect:</strong> Normal conversation.<br><strong>Action:</strong> None required.
+              </div></td></tr>
+    
+              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 85-90</td><td style="color:orange; font-weight:bold;">Risk</td></tr>
+              <tr class="details-row"><td colspan="2"><div class="details-content">
+                 <strong>Effect:</strong> Damage possible after 8 hours.<br><strong>Action:</strong> Wear earplugs.
+              </div></td></tr>
+    
+              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 100-110</td><td style="color:red; font-weight:bold;">High Risk</td></tr>
+              <tr class="details-row"><td colspan="2"><div class="details-content">
+                 <strong>Effect:</strong> Hearing loss in < 15 mins.<br><strong>Action:</strong> Use protection or leave.
+              </div></td></tr>
+    
+              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 120+</td><td style="color:#d32f2f; font-weight:bold;">Danger</td></tr>
+              <tr class="details-row"><td colspan="2"><div class="details-content">
+                 <strong>Effect:</strong> Immediate pain or injury.<br><strong>Action:</strong> Move away immediately.
+              </div></td></tr>
+            </tbody>
+          </table>
+        </div>
   </div>
 
   <div class="card">
@@ -467,50 +511,7 @@
     </div>
   </div>
 <div class="card col-span-1">
-  <div class="section-title">🔊 Noise Exposure Guide</div>
-
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Range (dB)</th>
-          <th>Perception</th>
-          <th>Impact on You</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>0 – 40</td>
-          <td>Quiet</td>
-          <td>Healthy. Ideal for sleep, recovery, and deep concentration.</td>
-        </tr>
-
-        <tr>
-          <td>40 – 60</td>
-          <td>Moderate</td>
-          <td>Safe. Standard office or household noise. No long-term health risk.</td>
-        </tr>
-
-        <tr>
-          <td>70 – 80</td>
-          <td>Loud</td>
-          <td>Stressful. Heavy traffic levels. Long exposure may cause hypertension and irritability.</td>
-        </tr>
-
-        <tr>
-          <td style="color:orange; font-weight:600;">85 – 90</td>
-          <td style="color:orange; font-weight:600;">Very Loud</td>
-          <td>Harmful. Inner-ear hair cells begin to get damaged. Earplugs recommended after 2 hours.</td>
-        </tr>
-
-        <tr>
-          <td style="color:#d32f2f; font-weight:700;">100 – 120</td>
-          <td style="color:#d32f2f; font-weight:700;">Dangerous</td>
-          <td>Critical. Risk of permanent hearing loss (Tinnitus) within ~15 minutes.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+  
 </div>
 
 </div>
