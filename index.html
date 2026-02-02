@@ -235,15 +235,15 @@
         <div id="aqi-bar" class="progress-striped" style="width:0%; height:100%; background-color:#ccc; transition: width 1.5s, background-color 0.5s;"></div>
       </div>
     </div>
-    <div id="live-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">Initializing...</div>
+    <div id="live-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">Waiting for ESP...</div>
     <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
     <p style="margin:0 0 5px 0; font-weight:500;">Noise Level</p>
     <div style="display:flex; align-items:baseline; justify-content:space-between;">
       <span id="live-noise" class="sensor-value" style="font-size:1.6rem;">Inactive</span>
-      <span class="sensor-sub">Sensor Data</span>
+      <span class="sensor-sub">Mic Monitor</span>
     </div>
     <canvas id="audio-visualizer"></canvas>
-    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Local Visualizer</button>
+    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
   </div>
 
   <div class="card">
@@ -458,56 +458,42 @@
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-  // --- REAL API LOGIC ---
+  // --- REAL DATA FETCHING ---
   async function fetchRealData() {
     try {
-      // Calls your /api/data handler
       const res = await fetch('/api/data');
       if (!res.ok) throw new Error("API not found");
       const data = await res.json();
 
-      // 1. Update AQI
+      // 1. Update AQI (If exists)
       if (data.aqi && data.aqi !== "--") {
         const aqiVal = parseInt(data.aqi);
         updateAQI(aqiVal);
         pushAQIData(aqiVal);
       }
 
-      // 2. Update pH
+      // 2. Update pH (If exists)
       if (data.ph && data.ph !== "--") {
         const phVal = parseFloat(data.ph);
         document.getElementById("live-ph").innerText = phVal.toFixed(1);
         
-        // Update Marker
         let phPos = Math.min((phVal / 14) * 100, 100);
         document.getElementById("ph-marker").style.left = phPos + "%";
         
-        // Update Badge
         const phBadge = document.getElementById("live-ph-badge");
         if(phVal < 6) { phBadge.innerText = "Acidic"; phBadge.style.borderColor = "red"; }
         else if(phVal > 8) { phBadge.innerText = "Alkaline"; phBadge.style.borderColor = "purple"; }
         else { phBadge.innerText = "Neutral"; phBadge.style.borderColor = "green"; }
       }
 
-      // 3. Update Noise
-      if (data.noise && data.noise !== "--") {
-        const noiseVal = parseInt(data.noise);
-        const display = document.getElementById("live-noise");
-        display.innerText = noiseVal + " dB";
-        
-        if (noiseVal < 50) display.style.color = "green";
-        else if (noiseVal < 80) display.style.color = "orange";
-        else display.style.color = "red";
-      }
-
     } catch (e) {
-      // console.log("Waiting for data...");
+      // API not ready yet, silently fail or retry
     }
   }
-  // Poll every 2 seconds
+  // Poll for data every 2 seconds
   setInterval(fetchRealData, 2000);
 
-  // --- UI HELPERS ---
+  // --- UI LOGIC ---
   function toggleRow(row) {
     row.classList.toggle("active");
     var details = row.nextElementSibling;
@@ -539,8 +525,8 @@
           btn.innerText = "☀️";
           localStorage.setItem('swachhify-theme', 'dark');
       }
-      const liveVal = parseInt(document.getElementById("aqi-display").innerText);
-      if(!isNaN(liveVal)) renderAdvice(liveVal, "live-advice-box");
+      const liveVal = document.getElementById("aqi-display").innerText;
+      if(!isNaN(parseInt(liveVal))) renderAdvice(parseInt(liveVal), "live-advice-box");
   }
   if (localStorage.getItem('swachhify-theme') === 'dark') {
       document.body.setAttribute('data-theme', 'dark');
@@ -607,7 +593,7 @@
     }
   }
 
-  // --- AUDIO VISUALIZER (Local) ---
+  // --- AUDIO VISUALIZER (FIXED) ---
   let audioCtx, analyser, dataArray;
   let isMicRunning = false;
   const canvas = document.getElementById("audio-visualizer");
@@ -646,6 +632,16 @@
     requestAnimationFrame(visualizeMic);
     analyser.getByteFrequencyData(dataArray);
     canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let sumSquares = 0;
+    for (let i = 0; i < dataArray.length; i++) sumSquares += dataArray[i] * dataArray[i];
+    const rms = Math.sqrt(sumSquares / dataArray.length);
+    let db = rms > 0 ? Math.round(20 * Math.log10(rms / 255) + 110) : 0;
+    
+    const display = document.getElementById("live-noise");
+    display.innerText = (db < 30 ? "< 30" : db) + " dB";
+    let val = parseInt(db) || 0;
+    display.style.color = val < 50 ? "green" : (val < 80 ? "orange" : "red");
 
     const barWidth = (canvas.width / (dataArray.length / 2));
     const centerY = canvas.height / 2;
