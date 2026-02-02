@@ -716,7 +716,9 @@ async function toggleMic() {
     for (let v of dataArray) sum += v;
     let avg = sum / dataArray.length;
     let rawDb = avg > 0 ? 20 * Math.log10(avg) : 0;
-    let db = Math.min(120, Math.round(rawDb * 2.5 + 30));
+    let db = Math.min(100, Math.round(rawDb * 1.2 + 20));
+    db = Math.max(db, 0);
+
 
 
     display.innerText = (db < 20 ? "<20" : db) + " dB";
