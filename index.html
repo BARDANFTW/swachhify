@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
+
     /* --- 1. GLOBAL VARIABLES --- */
     :root {
       --primary: #B6D83D; 
@@ -236,17 +237,7 @@
       </div>
     </div>
     <div id="live-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">Waiting for ESP...</div>
-    <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
-    <p style="margin:0 0 5px 0; font-weight:500;">Noise Level</p>
-    <div style="display:flex; align-items:baseline; justify-content:space-between;">
-      <span id="live-noise" class="sensor-value" style="font-size:1.6rem;">Inactive</span>
-      <span class="sensor-sub">Mic Monitor</span>
-    </div>
-    <canvas id="audio-visualizer"></canvas>
-    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
-  </div>
-
-  <div class="card">
+    <br>
     <div class="section-title">💧 Live Water pH</div>
     <div style="text-align:center; padding: 10px 0;">
         <p style="font-size:3rem; font-weight:bold; margin:10px 0;" id="live-ph">--</p>
@@ -255,6 +246,21 @@
         </div>
         <span id="live-ph-badge" style="padding:5px 15px; border-radius:20px; background:var(--inner-bg); font-weight:bold; color: var(--dark); border: 1px solid var(--border-color); font-size:0.9rem;">Waiting...</span>
     </div>
+    <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
+   
+  </div>
+
+  <div class="card">
+     <div class="section-title">🔊 Noise detector  </div>
+    <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
+    <p style="margin:0 0 5px 0; font-weight:500;">Noise Level</p>
+    <div style="display:flex; align-items:baseline; justify-content:space-between;">
+      <span id="live-noise" class="sensor-value" style="font-size:1.6rem;">Inactive</span>
+      <span class="sensor-sub">Mic Monitor</span>
+    </div>
+    <canvas id="audio-visualizer"></canvas>
+    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
+    <canvas id="audio-visualizer"></canvas>
   </div>
 
   <div class="card">
@@ -598,66 +604,123 @@
   }
 
   // --- AUDIO VISUALIZER (FIXED) ---
-  let audioCtx, analyser, dataArray;
-  let isMicRunning = false;
-  const canvas = document.getElementById("audio-visualizer");
-  const canvasCtx = canvas.getContext("2d");
+let audioCtx, analyser, dataArray, source, animationId;
+let isMicRunning = false;
 
-  function resizeCanvas() {
-      if(canvas.parentElement) {
-          canvas.width = canvas.parentElement.offsetWidth - 40; 
-          canvas.height = 70;
-      }
-  }
-  window.addEventListener('resize', resizeCanvas);
-  setTimeout(resizeCanvas, 100);
-
-  async function toggleMic() {
+async function toggleMic() {
     const btn = document.getElementById("btn-mic");
-    if (isMicRunning) { location.reload(); return; }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if(audioCtx.state === 'suspended') await audioCtx.resume();
-      const src = audioCtx.createMediaStreamSource(stream);
-      analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 256; 
-      src.connect(analyser);
-      dataArray = new Uint8Array(analyser.frequencyBinCount);
-      isMicRunning = true;
-      btn.innerText = "Stop Monitoring";
-      btn.classList.add("pulsing");
-      visualizeMic();
-    } catch (e) { alert("Microphone access denied."); }
-  }
-
-  function visualizeMic() {
-    if (!isMicRunning) return;
-    requestAnimationFrame(visualizeMic);
-    analyser.getByteFrequencyData(dataArray);
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-
-    let sumSquares = 0;
-    for (let i = 0; i < dataArray.length; i++) sumSquares += dataArray[i] * dataArray[i];
-    const rms = Math.sqrt(sumSquares / dataArray.length);
-    let db = rms > 0 ? Math.round(20 * Math.log10(rms / 255) + 110) : 0;
-    
     const display = document.getElementById("live-noise");
-    display.innerText = (db < 30 ? "< 30" : db) + " dB";
-    let val = parseInt(db) || 0;
-    display.style.color = val < 50 ? "green" : (val < 80 ? "orange" : "red");
+    const canvas = document.getElementById("audio-visualizer");
+    const canvasCtx = canvas.getContext("2d");
 
-    const barWidth = (canvas.width / (dataArray.length / 2));
-    const centerY = canvas.height / 2;
-    for(let i = 0; i < dataArray.length / 2; i++) {
-        const percent = dataArray[i] / 255;
-        const height = (canvas.height * 0.9) * percent; 
-        const hue = 120 - (percent * 120);
-        canvasCtx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-        canvasCtx.fillRect(i * barWidth, centerY - (height/2), barWidth - 1, height);
+    if (isMicRunning) {
+        // STOP LOGIC
+        isMicRunning = false;
+        cancelAnimationFrame(animationId);
+        if (audioCtx) await audioCtx.close();
+        btn.innerText = "Start Monitoring";
+        btn.classList.remove("pulsing");
+        display.innerText = "Inactive";
+        display.style.color = "white";
+        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+        return;
     }
-  }
 
+    // START LOGIC
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        
+        // Always create a new context on user gesture to avoid "suspended" state
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // If the browser started it in suspended mode, resume it
+        if (audioCtx.state === 'suspended') {
+            await audioCtx.resume();
+        }
+
+        source = audioCtx.createMediaStreamSource(stream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 512; // Higher detail for the wireframe look
+        
+        source.connect(analyser);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        
+        isMicRunning = true;
+        btn.innerText = "Stop Monitoring";
+        btn.classList.add("pulsing");
+        
+        renderFrame(); // Start drawing
+    } catch (err) {
+        console.error("Mic Error:", err);
+        if (err.name === 'NotAllowedError') {
+            alert("Permission denied. Please click the camera/mic icon in your URL bar to reset permissions.");
+        } else {
+            alert("Could not access microphone. Ensure you are using HTTPS or localhost.");
+        }
+    }
+
+    function renderFrame() {
+        if (!isMicRunning) return;
+        animationId = requestAnimationFrame(renderFrame);
+        analyser.getByteFrequencyData(dataArray);
+
+        // 1. Calculate DB
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+        let average = sum / dataArray.length;
+        let db = Math.round(average > 0 ? (20 * Math.log10(average)) : 0);
+        
+        display.innerText = (db < 20 ? "< 20" : db) + " dB";
+        display.style.color = db < 50 ? "#4CAF50" : (db < 75 ? "#FF9800" : "#F44336");
+
+        // 2. Draw Wireframe Wave
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        canvasCtx.clearRect;
+
+        // Create horizontal gradient for the rainbow look
+        let grad = canvasCtx.createLinearGradient(0, 0, width, 0);
+        grad.addColorStop(0, "#0055ff"); // Blue
+        grad.addColorStop(0.3, "#00ffcc"); // Cyan
+        grad.addColorStop(0.5, "#44ff00"); // Green
+        grad.addColorStop(0.7, "#ffff00"); // Yellow
+        grad.addColorStop(1, "#ff4400"); // Orange/Red
+
+        canvasCtx.strokeStyle = grad;
+        canvasCtx.lineWidth = 1;
+
+        // Draw 4 overlapping "wireframe" paths
+        for (let j = 0; j < 4; j++) {
+            canvasCtx.beginPath();
+            canvasCtx.globalAlpha = 1.0 - (j * 0.2); // Faint background lines
+            
+            let x = 0;
+            const sliceWidth = width / (dataArray.length / 2);
+
+            for (let i = 0; i < dataArray.length / 2; i++) {
+                const v = dataArray[i] / 128.0;
+                // Layering offset creates the complex "mesh" look
+                const y = (v * (height / 2)) * (0.8 - (j * 0.15));
+                const centerY = height / 2;
+
+                if (i === 0) canvasCtx.moveTo(x, centerY - y);
+                else canvasCtx.lineTo(x, centerY - y);
+                
+                x += sliceWidth;
+            }
+
+            // Mirror bottom
+            for (let i = dataArray.length / 2; i >= 0; i--) {
+                const v = dataArray[i] / 128.0;
+                const y = (v * (height / 2)) * (0.8 - (j * 0.15));
+                x -= sliceWidth;
+                canvasCtx.lineTo(x, height / 2 + y);
+            }
+            canvasCtx.stroke();
+        }
+    }
+}
   // --- CHART ---
   let aqiChart;
   let aqiHistory = [];
