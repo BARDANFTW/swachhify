@@ -12,6 +12,118 @@
 
   <style>
 
+
+    /* Noise table — same behavior as UV / pH tables */
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+
+}
+
+.table-container thead th {
+  background: transparent;
+  color: #5ccc11;
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 0.95rem;
+  border-bottom: 2px solid #5ccc11;
+  letter-spacing: 0.4px;
+}
+
+.table-container td {
+  padding: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  vertical-align: top;
+}
+
+.table-container tbody tr {
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.table-container tbody tr:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+/* expandable detail */
+.noise-summary {
+  font-weight: 500;
+}
+
+.noise-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  font-size: 0.85rem;
+  margin-top: 6px;
+ 
+  transition: max-height 0.6s ease, opacity 0.4s ease;
+}
+
+.table-container tbody tr:hover .noise-details {
+  max-height: 120px;
+  opacity: 1;
+}
+
+   /* UV Fluorescence Table — Clean Style */
+.uv-table {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+  /* Background removed as requested */
+}
+
+.uv-table th {
+  background: transparent;
+  color: #5ccc11; /* Brand Green */
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  text-align: left;
+  border-bottom: 2px solid #5ccc11;
+  letter-spacing: 0.5px;
+}
+
+.uv-table td {
+  padding: 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.1); /* Subtle divider for light backgrounds */
+  cursor: pointer;
+  transition: background 0.3s ease;
+  vertical-align: top;
+}
+
+/* If using on a dark theme, change border-bottom to: rgba(255,255,255,0.1) */
+
+.uv-table tr:hover {
+  background: rgba(0,0,0,0.02);
+}
+
+.uv-short {
+  font-weight: 700;
+  width: 30%;
+}
+
+/* Standardized Colors */
+.uv-color-white-blue { color: #1230d8; } /* Bright Blue */
+.uv-color-yellow     { color: #e9d201; } /* Deep Yellow/Gold */
+.uv-color-green      { color: #36da3e; } /* Forest Green */
+.uv-color-orange-red { color: #f55220; } /* Deep Orange/Red */
+.uv-color-none       { color: #706f6f; } /* Neutral Gray */
+
+.uv-details {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  font-size: 0.85rem;
+  margin-top: 6px;
+  
+  transition: max-height 0.6s ease, opacity 0.4s ease;
+}
+
+.uv-table tr:hover .uv-details {
+  max-height: 120px;
+  opacity: 1;
+}
+
     /* --- 1. GLOBAL VARIABLES --- */
     :root {
       --primary: #B6D83D; 
@@ -318,201 +430,346 @@
   <div class="card col-span-1">
     <div class="section-title">🔊 Noise Exposure Guide</div>
 
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Range (dB)</th>
-              <th>Perception</th>
-              <th>Impact on You</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>0 – 40</td>
-              <td>Quiet</td>
-              <td>Healthy. Ideal for sleep, recovery, and deep concentration.</td>
-            </tr>
-    
-            <tr>
-              <td>40 – 60</td>
-              <td>Moderate</td>
-              <td>Safe. Standard office or household noise. No long-term health risk.</td>
-            </tr>
-    
-            <tr>
-              <td>70 – 80</td>
-              <td>Loud</td>
-              <td>Stressful. Heavy traffic levels. Long exposure may cause hypertension and irritability.</td>
-            </tr>
-    
-            <tr>
-              <td style="color:orange; font-weight:600;">85 – 90</td>
-              <td style="color:orange; font-weight:600;">Very Loud</td>
-              <td>Harmful. Inner-ear hair cells begin to get damaged. Earplugs recommended after 2 hours.</td>
-            </tr>
-    
-            <tr>
-              <td style="color:#d32f2f; font-weight:700;">100 – 120</td>
-              <td style="color:#d32f2f; font-weight:700;">Dangerous</td>
-              <td>Critical. Risk of permanent hearing loss (Tinnitus) within ~15 minutes.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Range</th>
+        <th>Perception</th>
+        <th>Impact on You</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>0 – 40</td>
+        <td class="noise-summary">Quiet</td>
+        <td>
+          Healthy
+          <div class="noise-details">
+            Ideal for sleep, recovery, meditation, and deep concentration.
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td>40 – 60</td>
+        <td class="noise-summary">Moderate</td>
+        <td>
+          Safe
+          <div class="noise-details">
+            Typical household or office noise. No long-term health risk.
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td>70 – 80</td>
+        <td class="noise-summary">Loud</td>
+        <td>
+          Stressful
+          <div class="noise-details">
+            Heavy traffic levels. Prolonged exposure may increase stress, BP, and fatigue.
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="color:orange; font-weight:600;">85 – 90</td>
+        <td style="color:orange; font-weight:600;">Very Loud</td>
+        <td>
+          Harmful
+          <div class="noise-details">
+            Inner-ear hair cell damage begins. Hearing protection recommended after ~2 hours.
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="color:#d32f2f; font-weight:700;">100 – 120</td>
+        <td style="color:#d32f2f; font-weight:700;">Dangerous</td>
+        <td>
+          Critical
+          <div class="noise-details">
+            Risk of permanent hearing loss or tinnitus within ~15 minutes.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
       </div>
     
       <div class="card">
-        <div class="section-title">📊 Health Guide <span style="font-size:0.7rem; color:#888;">(Tap row)</span></div>
-        <div class="table-container">
-          <table>
-            <thead><tr><th>Range</th><th>Risk</th></tr></thead>
-            <tbody>
-              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 10-30</td><td>Safe</td></tr>
-              <tr class="details-row"><td colspan="2"><div class="details-content">
-                 <strong>Effect:</strong> Barely audible. Great for sleep.<br><strong>Action:</strong> Relax.
-              </div></td></tr>
-              
-              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 40-50</td><td>Safe</td></tr>
-              <tr class="details-row"><td colspan="2"><div class="details-content">
-                 <strong>Effect:</strong> Quiet room environment.<br><strong>Action:</strong> Good for focus.
-              </div></td></tr>
-    
-              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 60-70</td><td>Safe</td></tr>
-              <tr class="details-row"><td colspan="2"><div class="details-content">
-                 <strong>Effect:</strong> Normal conversation.<br><strong>Action:</strong> None required.
-              </div></td></tr>
-    
-              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 85-90</td><td style="color:orange; font-weight:bold;">Risk</td></tr>
-              <tr class="details-row"><td colspan="2"><div class="details-content">
-                 <strong>Effect:</strong> Damage possible after 8 hours.<br><strong>Action:</strong> Wear earplugs.
-              </div></td></tr>
-    
-              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 100-110</td><td style="color:red; font-weight:bold;">High Risk</td></tr>
-              <tr class="details-row"><td colspan="2"><div class="details-content">
-                 <strong>Effect:</strong> Hearing loss in < 15 mins.<br><strong>Action:</strong> Use protection or leave.
-              </div></td></tr>
-    
-              <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 120+</td><td style="color:#d32f2f; font-weight:bold;">Danger</td></tr>
-              <tr class="details-row"><td colspan="2"><div class="details-content">
-                 <strong>Effect:</strong> Immediate pain or injury.<br><strong>Action:</strong> Move away immediately.
-              </div></td></tr>
-            </tbody>
-          </table>
-        </div>
+        <h3 class="section-title">💡 UV Fluorescence Guide</h3>
+
+      <table class="uv-table">
+        <tr>
+          <th>Color</th>
+          <th>Meaning</th>
+        </tr>
+
+        <tr>
+          <td class="uv-short uv-color-white-blue">Bright White / Blue</td>
+          <td>
+            Cleaners, detergents, skin oils
+            <div class="uv-details">
+              Common optical brighteners fluoresce strongly. Not harmful by default, but indicates residue.
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="uv-short uv-color-yellow">Yellow</td>
+          <td>
+            Sweat, urine traces
+            <div class="uv-details">
+              Organic waste materials glow yellow. Strong intensity = poor hygiene or unclean surface.
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="uv-short uv-color-green">Green</td>
+          <td>
+            Saliva, mold spores
+            <div class="uv-details">
+              Can indicate biological material. Mold may glow greenish-blue under UV.
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="uv-short uv-color-orange-red">Orange / Red</td>
+          <td>
+            Food residue, rust, oils
+            <div class="uv-details">
+              Usually non-biological. Food spills and oxidation products fluoresce warm colors.
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="uv-short uv-color-none">Weak / No Glow</td>
+          <td>
+            Dust, clean surfaces
+            <div class="uv-details">
+              Low organic content. Does not guarantee sterility, just low fluorescence.
+            </div>
+          </td>
+        </tr>
+      </table>
   </div>
 
 
 
   <div class="card">
-    <div class="section-title">🧪 pH Guide <span style="font-size:0.7rem; color:#888;">(Tap row)</span></div>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>pH</th><th>Type</th></tr></thead>
-        <tbody>
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 0-2</td><td style="color:red; font-weight:bold;">Acidic</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Battery Acid. Corrosive.<br><strong>Action:</strong> Neutralize immediately.
-          </div></td></tr>
+    <div class="section-title">🧪 pH Guide</div>
 
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 3-4</td><td style="color:orange;">Acidic</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Acid Rain/Soda. Harmful to plants.<br><strong>Action:</strong> Limit exposure.
-          </div></td></tr>
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>pH</th>
+        <th>Type</th>
+      </tr>
+    </thead>
 
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 5-6</td><td style="color:#bcbc03;">Mild Acid</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Coffee/Skin. Safe consumption.<br><strong>Action:</strong> No action needed.
-          </div></td></tr>
+    <tbody>
+      <tr>
+        <td class="noise-summary">0 – 2</td>
+        <td style="color:red; font-weight:bold;">
+          Acidic
+          <div class="noise-details">
+            <strong>Effect:</strong> Battery acid, gastric acid.<br>
+            <strong>Risk:</strong> Highly corrosive. Severe burns.<br>
+            <strong>Action:</strong> Neutralize immediately.
+          </div>
+        </td>
+      </tr>
 
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 7</td><td style="color:green; font-weight:bold;">Neutral</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Pure Water. Perfect balance.<br><strong>Action:</strong> Drinkable (if clean).
-          </div></td></tr>
+      <tr>
+        <td class="noise-summary">3 – 4</td>
+        <td style="color:orange;">
+          Acidic
+          <div class="noise-details">
+            <strong>Effect:</strong> Acid rain, soda.<br>
+            <strong>Risk:</strong> Harmful to plants and teeth.<br>
+            <strong>Action:</strong> Limit exposure.
+          </div>
+        </td>
+      </tr>
 
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 8-9</td><td style="color:#bcbc03;">Alkaline</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Baking Soda. Mild base.<br><strong>Action:</strong> Used for cleaning/baking.
-          </div></td></tr>
+      <tr>
+        <td class="noise-summary">5 – 6</td>
+        <td style="color:#bcbc03;">
+          Mild Acid
+          <div class="noise-details">
+            <strong>Effect:</strong> Coffee, skin pH.<br>
+            <strong>Risk:</strong> Generally safe.<br>
+            <strong>Action:</strong> No action needed.
+          </div>
+        </td>
+      </tr>
 
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 10-12</td><td style="color:blue;">High Alk</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Soapy Water. Irritant.<br><strong>Action:</strong> Rinse if contacted.
-          </div></td></tr>
+      <tr>
+        <td class="noise-summary">7</td>
+        <td style="color:green; font-weight:bold;">
+          Neutral
+          <div class="noise-details">
+            <strong>Effect:</strong> Pure water.<br>
+            <strong>Risk:</strong> None if clean.<br>
+            <strong>Action:</strong> Safe for drinking.
+          </div>
+        </td>
+      </tr>
 
-          <tr class="expandable-row" onclick="toggleRow(this)"><td><span class="toggle-icon">▶</span> 13-14</td><td style="color:purple; font-weight:bold;">Toxic</td></tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Effect:</strong> Bleach/Lye. Caustic burns.<br><strong>Action:</strong> Do not touch.
-          </div></td></tr>
-        </tbody>
-      </table>
-    </div>
+      <tr>
+        <td class="noise-summary">8 – 9</td>
+        <td style="color:#bcbc03;">
+          Alkaline
+          <div class="noise-details">
+            <strong>Effect:</strong> Baking soda solution.<br>
+            <strong>Risk:</strong> Mild irritation possible.<br>
+            <strong>Action:</strong> Common household use.
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="noise-summary">10 – 12</td>
+        <td style="color:blue;">
+          High Alkaline
+          <div class="noise-details">
+            <strong>Effect:</strong> Soapy water.<br>
+            <strong>Risk:</strong> Skin and eye irritation.<br>
+            <strong>Action:</strong> Rinse if contacted.
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="noise-summary">13 – 14</td>
+        <td style="color:purple; font-weight:bold;">
+          Toxic
+          <div class="noise-details">
+            <strong>Effect:</strong> Bleach, lye.<br>
+            <strong>Risk:</strong> Severe chemical burns.<br>
+            <strong>Action:</strong> Do not touch.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
   </div>
 
   <div class="card">
-    <div class="section-title">🌌 Bortle Scale <span style="font-size:0.7rem; color:#888;">(Tap row)</span></div>
-    <div class="table-container">
-      <table>
-        <thead><tr><th>Class</th><th>Sky Type</th></tr></thead>
-        <tbody>
-          <tr class="expandable-row" onclick="toggleRow(this)">
-            <td><span class="toggle-icon">▶</span> 1</td><td>Excellent</td>
-          </tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Visibility:</strong> Zodiacal light visible. Airglow present.<br><strong>Stars:</strong> Limiting mag 7.6-8.0.
-          </div></td></tr>
+    <div class="section-title">🌌 Bortle Scale</div>
 
-          <tr class="expandable-row" onclick="toggleRow(this)">
-            <td><span class="toggle-icon">▶</span> 2</td><td>Typical Dark</td>
-          </tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Visibility:</strong> Milky Way highly structured.<br><strong>Stars:</strong> Limiting mag 7.1-7.5.
-          </div></td></tr>
+<div class="table-container">
+  <table>
+    <thead>
+      <tr>
+        <th>Class</th>
+        <th>Sky Type</th>
+      </tr>
+    </thead>
 
-          <tr class="expandable-row" onclick="toggleRow(this)">
-            <td><span class="toggle-icon">▶</span> 3</td><td>Rural Sky</td>
-          </tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Visibility:</strong> Complex Milky Way. Light domes on horizon.<br><strong>Stars:</strong> Limiting mag 6.6-7.0.
-          </div></td></tr>
+    <tbody>
+      <tr>
+        <td class="noise-summary">1</td>
+        <td>
+          Excellent
+          <div class="noise-details">
+            <strong>Visibility:</strong> Zodiacal light visible, airglow present.<br>
+            <strong>Stars:</strong> Limiting magnitude 7.6–8.0.
+          </div>
+        </td>
+      </tr>
 
-          <tr class="expandable-row" onclick="toggleRow(this)">
-            <td><span class="toggle-icon">▶</span> 4</td><td>Rural/Sub</td>
-          </tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Visibility:</strong> Milky Way lacks detail. Transition zone.<br><strong>Stars:</strong> Limiting mag 6.1-6.5.
-          </div></td></tr>
+      <tr>
+        <td class="noise-summary">2</td>
+        <td>
+          Typical Dark
+          <div class="noise-details">
+            <strong>Visibility:</strong> Milky Way highly structured.<br>
+            <strong>Stars:</strong> Limiting magnitude 7.1–7.5.
+          </div>
+        </td>
+      </tr>
 
-          <tr class="expandable-row" onclick="toggleRow(this)">
-            <td><span class="toggle-icon">▶</span> 5</td><td>Suburban</td>
-          </tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Visibility:</strong> Milky Way washed out.<br><strong>Stars:</strong> Limiting mag 5.6-6.0.
-          </div></td></tr>
+      <tr>
+        <td class="noise-summary">3</td>
+        <td>
+          Rural Sky
+          <div class="noise-details">
+            <strong>Visibility:</strong> Complex Milky Way, light domes on horizon.<br>
+            <strong>Stars:</strong> Limiting magnitude 6.6–7.0.
+          </div>
+        </td>
+      </tr>
 
-          <tr class="expandable-row" onclick="toggleRow(this)">
-            <td><span class="toggle-icon">▶</span> 6</td><td>Bright Sub</td>
-          </tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Visibility:</strong> Milky Way invisible. Sky glows gray.<br><strong>Stars:</strong> Limiting mag 5.1-5.5.
-          </div></td></tr>
+      <tr>
+        <td class="noise-summary">4</td>
+        <td>
+          Rural / Suburban
+          <div class="noise-details">
+            <strong>Visibility:</strong> Milky Way lacks detail. Transition zone.<br>
+            <strong>Stars:</strong> Limiting magnitude 6.1–6.5.
+          </div>
+        </td>
+      </tr>
 
-          <tr class="expandable-row" onclick="toggleRow(this)">
-            <td><span class="toggle-icon">▶</span> 7</td><td style="color:orange;">Sub/Urban</td>
-          </tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Visibility:</strong> Stars scarce. Background bright.<br><strong>Stars:</strong> Limiting mag 4.6-5.0.
-          </div></td></tr>
+      <tr>
+        <td class="noise-summary">5</td>
+        <td>
+          Suburban
+          <div class="noise-details">
+            <strong>Visibility:</strong> Milky Way washed out.<br>
+            <strong>Stars:</strong> Limiting magnitude 5.6–6.0.
+          </div>
+        </td>
+      </tr>
 
-          <tr class="expandable-row" onclick="toggleRow(this)">
-            <td><span class="toggle-icon">▶</span> 8-9</td><td style="color:red; font-weight:bold;">City</td>
-          </tr>
-          <tr class="details-row"><td colspan="2"><div class="details-content">
-             <strong>Visibility:</strong> Sky white/orange. Only planets visible.<br><strong>Stars:</strong> Limiting mag < 4.5.
-          </div></td></tr>
-        </tbody>
-      </table>
-    </div>
+      <tr>
+        <td class="noise-summary">6</td>
+        <td>
+          Bright Suburban
+          <div class="noise-details">
+            <strong>Visibility:</strong> Milky Way invisible, sky glows gray.<br>
+            <strong>Stars:</strong> Limiting magnitude 5.1–5.5.
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="noise-summary">7</td>
+        <td style="color:orange;">
+          Suburban / Urban
+          <div class="noise-details">
+            <strong>Visibility:</strong> Few stars, bright background.<br>
+            <strong>Stars:</strong> Limiting magnitude 4.6–5.0.
+          </div>
+        </td>
+      </tr>
+
+      <tr>
+        <td class="noise-summary">8–9</td>
+        <td style="color:red; font-weight:bold;">
+          City
+          <div class="noise-details">
+            <strong>Visibility:</strong> Sky white/orange, only planets visible.<br>
+            <strong>Stars:</strong> Limiting magnitude &lt; 4.5.
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
   </div>
 
 
