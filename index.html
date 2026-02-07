@@ -136,7 +136,10 @@
       --border-color: #eee;
       --inner-bg: #f9f9f9;
     }
+h1.aligned-heading {
+    margin-left: 45%; /* Shifts the start of the text to 1/3rd of the page */
 
+  }
     body[data-theme="dark"] {
       --primary: #121212;          
       --accent: #B6D83D;           
@@ -259,6 +262,49 @@
     }
 
     /* --- 7. TABLES --- */
+   /* 1. Main Wrapper: Now handles the Grid AND the Border */
+.main-wrapper {
+  margin-left: 10%; /* Your 1/3rd left alignment */
+  margin-right: 10%;
+  padding: 30px;
+  
+  /* Smooth Border Design */
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+
+  /* Grid Logic moved here */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Forces 2 equal columns */
+  gap: 25px; 
+}
+
+/* 2. Equal Height Cards */
+.main-wrapper .card {
+  min-height: 520px; /* Forces cards to be the same size */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0; /* Ensures grid alignment is perfect */
+  background: rgba(54, 54, 54, 0.03); /* Optional: slight depth inside wrapper */
+}
+
+/* 3. Internal Table Scrolling */
+.table-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  margin-top: 15px;
+}
+
+/* 4. Responsive: Stack to 1 column on smaller screens */
+@media (max-width: 1024px) {
+  .main-wrapper {
+    margin-left: 5%;
+    margin-right: 5%;
+    grid-template-columns: 1fr; /* Switch to single column */
+  }
+}
     .table-container { overflow-x: auto; max-height: 350px; overflow-y: auto; }
     table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
     th, td { padding: 12px 8px; border-bottom: 1px solid var(--border-color); text-align: left; }
@@ -322,7 +368,184 @@
     body[data-theme="dark"] #combined-forecast { background-color: var(--inner-bg) !important; border-color: var(--border-color) !important; color: var(--dark); }
     
     .advice-box { padding: 12px; border-radius: 8px; margin-top: 15px; font-size: 0.85rem; font-weight: 500; transition: all 0.5s ease; text-align: center; border: 1px solid transparent; }
-  </style>
+ /* 3-COLUMN CENTERED GRID */
+#centered-triple-grid {
+  display: grid;
+  /* repeat(3, 350px) keeps them the same size regardless of screen width */
+  /* Change 350px to match your existing card width */
+  grid-template-columns: repeat(2, 350px) 350px; 
+  gap: 20px;
+  justify-content: center; /* This centers the entire grid on the page */
+  margin: 40px auto;
+  width: 100%;
+}
+
+.info-table-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg, #ffffff);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid var(--border-color, #eee);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  height: fit-content; /* Keeps cards from stretching vertically */
+}
+
+.empty-spacer {
+  visibility: hidden; /* Takes up space but is invisible */
+}
+
+/* Table Design */
+.info-table-card table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.info-table-card th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.info-table-card td {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+  vertical-align: top;
+  font-size: 0.9rem;
+}
+
+/* Detail styling for "Sense More" feel */
+.noise-details {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-top: 4px;
+  line-height: 1.2;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 1100px) {
+  #centered-triple-grid {
+    grid-template-columns: 1fr; /* Stack on small screens */
+    width: 90%;
+  }
+  .empty-spacer { display: none; }
+}
+/* --- FOOTER / ABOUT US SECTION --- */
+.footer {
+  background: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+  padding: 60px 10%;
+  margin-top: 50px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1.2fr;
+  gap: 40px;
+  transition: background 0.3s ease;
+}
+
+.footer-brand img {
+  height: 80px;
+  margin-bottom: 20px;
+}
+
+.footer-brand p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  opacity: 0.8;
+  max-width: 300px;
+}
+
+.footer-section h3 {
+  color: var(--accent);
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.footer-section h3::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 30px;
+  height: 2px;
+  background: var(--accent);
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.footer-links li i {
+  margin-right: 10px;
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+}
+
+.founder-name {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.copyright {
+  grid-column: span 3;
+  text-align: center;
+  padding-top: 40px;
+  font-size: 0.8rem;
+  opacity: 0.6;
+  border-top: 1px solid var(--border-color);
+}
+
+@media (max-width: 900px) {
+  .footer {
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 40px 5%;
+  }
+  .footer-brand p { margin: 0 auto 20px auto; }
+  .footer-section h3::after { left: 50%; transform: translateX(-50%); }
+  .footer-links li { justify-content: center; }
+}
+/* Smooth scrolling for the whole page */
+html {
+  scroll-behavior: smooth;
+}
+
+
+
+
+@keyframes borderGlow {
+  0% { box-shadow: 0 0 0px rgba(182, 216, 61, 0); }
+  50% { box-shadow: 0 0 20px rgba(182, 216, 61, 0.6); }
+  100% { box-shadow: 0 0 0px rgba(182, 216, 61, 0); }
+}
+@keyframes highlightTable {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); box-shadow: 0 0 20px rgba(182, 216, 61, 0.4); }
+  100% { transform: scale(1); }
+}
+ </style>
 </head>
 <body>
 
@@ -343,44 +566,63 @@
     <div id="map"></div>
   </div>
 
-  <div class="card">
-    <div class="section-title">📡 Live Sensors</div>
-    <div style="margin-bottom: 10px;">
-      <p style="margin:0 0 5px 0; font-weight:500;">Local AQI</p>
-      <div style="display:flex; align-items:baseline; justify-content:space-between;">
-        <span id="aqi-display" class="sensor-value">--</span>
-        <span class="sensor-sub">ESP32: <span style="color:green"><span class="status-dot"></span>Online</span></span>
-      </div>
-      <div style="height:6px; background:#eee; border-radius:3px; margin-top:5px; overflow:hidden;">
-        <div id="aqi-bar" class="progress-striped" style="width:0%; height:100%; background-color:#ccc; transition: width 1.5s, background-color 0.5s;"></div>
-      </div>
-    </div>
-    <div id="live-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">Waiting for ESP...</div>
-    <br>
-    <div class="section-title">💧 Live Water pH</div>
-    <div style="text-align:center; padding: 10px 0;">
-        <p style="font-size:3rem; font-weight:bold; margin:10px 0;" id="live-ph">--</p>
-        <div style="width:100%; height:12px; background:linear-gradient(to right, #ff4b2b, #ffb447, #7eb621, #21b6b6, #2b5dff, #8a2be2); border-radius:10px; position:relative; margin-bottom:20px;">
-          <div id="ph-marker" style="position:absolute; left:50%; top:-6px; width:6px; height:24px; background:var(--light); border:1px solid var(--dark); border-radius:2px; transition: all 0.5s ease; box-shadow: 0 0 10px rgba(0,0,0,0.2);"></div>
-        </div>
-        <span id="live-ph-badge" style="padding:5px 15px; border-radius:20px; background:var(--inner-bg); font-weight:bold; color: var(--dark); border: 1px solid var(--border-color); font-size:0.9rem;">Waiting...</span>
-    </div>
-    <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
-   
-  </div>
+  
 
-  <div class="card">
-     <div class="section-title">🔊 Noise detector  </div>
-    <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
-    <p style="margin:0 0 5px 0; font-weight:500;">Noise Level</p>
-    <div style="display:flex; align-items:baseline; justify-content:space-between;">
-      <span id="live-noise" class="sensor-value" style="font-size:1.6rem;">Inactive</span>
-      <span class="sensor-sub">Mic Monitor</span>
-    </div>
-    <canvas id="audio-visualizer"></canvas>
-    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
+<div class="card"><div class="card">
+  <div class="section-title">💧 Live Water pH</div>
+  <div style="text-align:center; padding: 10px 0;">
+    <p style="font-size:3rem; font-weight:bold; margin:10px 0;" id="live-ph">--</p>
     
+    <div style="width:100%; height:12px; background:linear-gradient(to right, #ff4b2b, #ffb447, #7eb621, #21b6b6, #2b5dff, #8a2be2); border-radius:10px; position:relative; margin-bottom:20px;">
+      <div id="ph-marker" style="position:absolute; left:50%; top:-6px; width:6px; height:24px; background:var(--light); border:1px solid var(--dark); border-radius:2px; transition: all 0.5s ease; box-shadow: 0 0 10px rgba(0,0,0,0.2);"></div>
+    </div>
+    
+    <span id="live-ph-badge" style="padding:5px 15px; border-radius:20px; background:var(--inner-bg); font-weight:bold; color: var(--dark); border: 1px solid var(--border-color); font-size:0.9rem;">Waiting...</span>
   </div>
+ 
+</div>
+<br>
+ <a href="#ph-table-section" style="text-align: center;">
+  <button id="btn-mic" class="mic-btn" style="font-family: 'Poppins'; transition: 0.3s;">
+    <strong>pH Safety Guide</strong>
+  </button>
+</a>
+</div>
+ 
+
+  <div class="card col-span-2">
+    <div class="section-title">📈 AQI Trend (History)</div>
+    <div style="position: relative; height: 300px; width: 100%;">
+        <canvas id="aqiChart"></canvas>
+    </div>
+  </div>
+  <div class="card col-span-1">
+    <div class="card">
+  <div class="section-title">🌬️ Local Air Quality</div>
+  <div style="margin-bottom: 10px;">
+    <p style="margin:0 0 5px 0; font-weight:500;">Current AQI Index</p>
+    <div style="display:flex; align-items:baseline; justify-content:space-between;">
+      <span id="aqi-display" class="sensor-value">--</span>
+      <span class="sensor-sub">ESP32: <span style="color:green"><span class="status-dot"></span>Online</span></span>
+    </div>
+    <div style="height:6px; background:#eee; border-radius:3px; margin-top:5px; overflow:hidden;">
+      <div id="aqi-bar" class="progress-striped" style="width:0%; height:100%; background-color:#ccc; transition: width 1.5s, background-color 0.5s;"></div>
+    </div>
+  </div>
+  <div id="live-advice-box" class="advice-box" style="background:#f5f5f5; color:#666;">Waiting for ESP...</div>
+</div>
+<br>
+<a href="#aqi-table-section" class="scroll-btn" style="text-align: center;">
+  <button id="btn-mic" class="mic-btn" style="font-family: 'Poppins'; transition: 0.3s;">
+    <strong>Detailed AQI Guide</strong>
+  </button>
+</a>
+      </div>
+      </div>
+      <div class = "dashboard">
+
+  
+
 
   <div class="card">
     <div class="section-title">☁️ Forecast</div>
@@ -419,15 +661,110 @@
         <p id="sky-quality" style="font-weight:600; font-size:1rem; margin:5px 0;">--</p>
       </div>
     </div>
-  </div>
-
-  <div class="card col-span-2">
-    <div class="section-title">📈 AQI Trend (History)</div>
-    <div style="position: relative; height: 300px; width: 100%;">
-        <canvas id="aqiChart"></canvas>
+  </div>  
+    <div class="card"><div class="card">
+     <div class="section-title">🔊 Noise detector  </div>
+    <hr style="border:0; border-top:1px solid var(--border-color); margin:15px 0;">
+    <p style="margin:0 0 5px 0; font-weight:500;">Noise Level</p>
+    <div style="display:flex; align-items:baseline; justify-content:space-between;">
+      <span id="live-noise" class="sensor-value" style="font-size:1.6rem;">Inactive</span>
+      <span class="sensor-sub">Mic Monitor</span>
     </div>
+    <canvas id="audio-visualizer"></canvas>
+    <button id="btn-mic" class="mic-btn" onclick="toggleMic()">Start Monitoring</button>
+</div>
+
+</div>
+ 
+ </div>
+
+
+<h1 class="aligned-heading">Tables</h2>
+  <div class = "main-wrapper">
+
+      <div class="card" id="aqi-table-section">
+  <div class="section-title">🌬️ Air Quality Index (AQI)</div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Index</th>
+          <th>Air Quality Category</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td class="noise-summary">0–50</td>
+          <td>
+            Good
+            <div class="noise-details">
+              <strong>Impact:</strong> Satisfactory; little to no health risk.<br>
+              <strong>Action:</strong> Great day for outdoor activities.
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="noise-summary">51–100</td>
+          <td>
+            Moderate
+            <div class="noise-details">
+              <strong>Impact:</strong> Acceptable; risk for highly sensitive people.<br>
+              <strong>Action:</strong> Sensitive groups should limit heavy exertion.
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="noise-summary">101–150</td>
+          <td style="color:orange;">
+            Unhealthy (Sensitive Groups)
+            <div class="noise-details">
+              <strong>Impact:</strong> Risk for children, elderly, and heart patients.<br>
+              <strong>Action:</strong> Reduce prolonged outdoor activity.
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="noise-summary">151–200</td>
+          <td style="color:red; font-weight:bold;">
+            Unhealthy
+            <div class="noise-details">
+              <strong>Impact:</strong> Everyone may begin to feel health effects.<br>
+              <strong>Action:</strong> Wear N95 masks; avoid outdoor exercise.
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="noise-summary">201–300</td>
+          <td style="color:purple; font-weight:bold;">
+            Very Unhealthy
+            <div class="noise-details">
+              <strong>Impact:</strong> Health alert: serious effects for all.<br>
+              <strong>Action:</strong> Stay indoors; keep windows closed.
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="noise-summary">301+</td>
+          <td style="color:maroon; font-weight:bold;">
+            Hazardous
+            <div class="noise-details">
+              <strong>Impact:</strong> Health warning: emergency conditions.<br>
+              <strong>Action:</strong> Strictly avoid all outdoor physical activity.
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <div class="card col-span-1">
+</div>
+<div class="card" id="noise-table-section">
     <div class="section-title">🔊 Noise Exposure Guide</div>
 
 <div class="table-container">
@@ -500,71 +837,8 @@
 </div>
 
       </div>
-    
-      <div class="card">
-        <h3 class="section-title">💡 UV Fluorescence Guide</h3>
 
-      <table class="uv-table">
-        <tr>
-          <th>Color</th>
-          <th>Meaning</th>
-        </tr>
-
-        <tr>
-          <td class="uv-short uv-color-white-blue">Bright White / Blue</td>
-          <td>
-            Cleaners, detergents, skin oils
-            <div class="uv-details">
-              Common optical brighteners fluoresce strongly. Not harmful by default, but indicates residue.
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="uv-short uv-color-yellow">Yellow</td>
-          <td>
-            Sweat, urine traces
-            <div class="uv-details">
-              Organic waste materials glow yellow. Strong intensity = poor hygiene or unclean surface.
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="uv-short uv-color-green">Green</td>
-          <td>
-            Saliva, mold spores
-            <div class="uv-details">
-              Can indicate biological material. Mold may glow greenish-blue under UV.
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="uv-short uv-color-orange-red">Orange / Red</td>
-          <td>
-            Food residue, rust, oils
-            <div class="uv-details">
-              Usually non-biological. Food spills and oxidation products fluoresce warm colors.
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="uv-short uv-color-none">Weak / No Glow</td>
-          <td>
-            Dust, clean surfaces
-            <div class="uv-details">
-              Low organic content. Does not guarantee sterility, just low fluorescence.
-            </div>
-          </td>
-        </tr>
-      </table>
-  </div>
-
-
-
-  <div class="card">
+  <div class="card" id="ph-table-section">
     <div class="section-title">🧪 pH Guide</div>
 
 <div class="table-container">
@@ -770,93 +1044,53 @@
   </table>
 </div>
 
-  </div>
-<div class="card">
-  <div class="section-title">🌬️ Air Quality Index (AQI)</div>
-
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Index</th>
-          <th>Air Quality Category</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr>
-          <td class="noise-summary">0–50</td>
-          <td>
-            Good
-            <div class="noise-details">
-              <strong>Impact:</strong> Satisfactory; little to no health risk.<br>
-              <strong>Action:</strong> Great day for outdoor activities.
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="noise-summary">51–100</td>
-          <td>
-            Moderate
-            <div class="noise-details">
-              <strong>Impact:</strong> Acceptable; risk for highly sensitive people.<br>
-              <strong>Action:</strong> Sensitive groups should limit heavy exertion.
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="noise-summary">101–150</td>
-          <td style="color:orange;">
-            Unhealthy (Sensitive Groups)
-            <div class="noise-details">
-              <strong>Impact:</strong> Risk for children, elderly, and heart patients.<br>
-              <strong>Action:</strong> Reduce prolonged outdoor activity.
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="noise-summary">151–200</td>
-          <td style="color:red; font-weight:bold;">
-            Unhealthy
-            <div class="noise-details">
-              <strong>Impact:</strong> Everyone may begin to feel health effects.<br>
-              <strong>Action:</strong> Wear N95 masks; avoid outdoor exercise.
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="noise-summary">201–300</td>
-          <td style="color:purple; font-weight:bold;">
-            Very Unhealthy
-            <div class="noise-details">
-              <strong>Impact:</strong> Health alert: serious effects for all.<br>
-              <strong>Action:</strong> Stay indoors; keep windows closed.
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td class="noise-summary">301+</td>
-          <td style="color:maroon; font-weight:bold;">
-            Hazardous
-            <div class="noise-details">
-              <strong>Impact:</strong> Health warning: emergency conditions.<br>
-              <strong>Action:</strong> Strictly avoid all outdoor physical activity.
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
 
 
 </div>
+</div>
+<footer class="footer">
+  <div class="footer-brand">
+    <img src="swachhify_logo.png" alt="Swachhify Logo" onerror="this.style.display='none'">
+    <p>
+      <strong>Swachhify</strong> is dedicated to real-time environmental transparency. 
+      By combining IoT sensor data with intuitive analytics, we empower communities 
+      to breathe cleaner, live quieter, and sense more.
+    </p>
+  </div>
 
+  <div class="footer-section">
+    <h3>Founders</h3>
+    <ul class="footer-links">
+      <li><span class="founder-name">Aarohan Karki</span></li>
+      <li><span class="founder-name">Bardan Bajracharya</span></li>
+      <li><span class="founder-name">Amrit Adhikari</span></li>
+      <li><span class="founder-name">Aavash Poudel</span></li>
+      <li><span class="founder-name">Aarav Thakur</span></li>
+    </ul>
+  </div>
+
+  <div class="footer-section">
+    <h3>Get in Touch</h3>
+    <ul class="footer-links">
+      <li>
+        <span>📍 Kathmandu, Nepal</span>
+      </li>
+      <li>
+        <span>✉️ <a href="mailto:contact@swachhify.com">contact@swachhify.com</a></span>
+      </li>
+      <li>
+        <span>🌐 <a href="#">www.swachhify.com</a></span>
+      </li>
+    </ul>
+    <div style="margin-top: 20px;">
+        <p style="font-size: 0.85rem; opacity: 0.8;">Stay updated on our latest sensor deployments and environmental reports.</p>
+    </div>
+  </div>
+
+  <div class="copyright">
+    &copy; 2024 Swachhify Environment Monitor. All rights reserved.
+  </div>
+</footer>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
   // --- REAL DATA FETCHING ---
