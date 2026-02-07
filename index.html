@@ -172,18 +172,49 @@ h1.aligned-heading {
       transition: background 0.3s ease;
     }
 
-    .theme-toggle {
-      position: absolute; top: 20px; right: 20px;
-      background: rgba(255,255,255,0.2);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: var(--dark); font-size: 1.2rem;
-      width: 40px; height: 40px; border-radius: 50%;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: all 0.3s ease; z-index: 1000;
-    }
-    .theme-toggle:hover { background: rgba(255,255,255,0.4); transform: rotate(15deg) scale(1.1); }
-    body[data-theme="dark"] .theme-toggle { background: rgba(255,255,255,0.1); color: #fff; }
+    /* --- Updated Theme Toggle Logic --- */
 
+.theme-toggle {
+  position: absolute; 
+  top: 20px; 
+  right: 20px;
+  /* Changed from transparent RGBA to a solid light color */
+  background-color: #f0f0f0 !important; 
+  border: 1px solid rgba(0,0,0,0.1);
+  color: #3C8C18; /* Using your specific green for the icon */
+  font-size: 1.2rem;
+  width: 40px; 
+  height: 40px; 
+  border-radius: 50%;
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  z-index: 1000;
+  
+  /* Applying the dynamic animations we discussed */
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              background-color 0.3s ease;
+}
+
+/* 1. HOVER: Scale 1.1 and rotate */
+.theme-toggle:hover { 
+  background-color: #ffffff !important;
+  transform: scale(1.1) rotate(15deg); 
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* 2. CLICK: Squish effect */
+.theme-toggle:active {
+  transform: scale(0.92);
+}
+
+/* 3. DARK MODE: Background remains light, icon color matches background (hidden) */
+body[data-theme="dark"] .theme-toggle { 
+  background-color: #363636 !important; 
+  color: #3d3d3d !important; /* Hides the icon by matching the button color */
+  border: 1px solid transparent;
+}
     header img {
       height: 120px; width: 120px; display: block; margin: 0 auto 10px auto;
       animation: float 6s ease-in-out infinite;
@@ -333,7 +364,29 @@ h1.aligned-heading {
       border-radius: 8px;
     }
 
-    
+    /* --- Updated Button Logic --- */
+
+/* 1. Ensure the base button has a consistent background */
+.mic-btn,.detailed-aqi-btn, .ph-safety-btn {
+  background: var(--accent) !important; /* Forces brand green in both modes */
+  color: white; /* Default text for light mode */
+  transition: all 0.3s ease;
+}
+
+/* 2. Dark Mode specific behavior */
+body[data-theme="dark"] .mic-btn,
+
+/* Add any other button classes here */
+body[data-theme="dark"] button {
+  background: #3c8c18 !important; /* Keep the light mode green/accent */
+  color: #ffffff !important;      /* Change text color to match the background */
+}
+
+/* 3. Maintain visibility for the pulsing (danger) state if active */
+body[data-theme="dark"] .mic-btn.pulsing {
+  background: #d32f2f !important;
+  color: #d32f2f !important;
+}
     .mic-btn {
       width: 100%; padding: 15px; border: none; border-radius: 12px;
       background: var(--accent); color: white; font-weight: 600; font-size: 1rem;
@@ -341,6 +394,58 @@ h1.aligned-heading {
     }
     .mic-btn:active { transform: scale(0.96); }
     .mic-btn.pulsing { background: #d32f2f; animation: pulse 1.5s infinite; }
+/* --- Dynamic Button Animations --- */
+
+.mic-btn, 
+ 
+.detailed-aqi-btn, 
+.ph-safety-btn,
+button[class*="-btn"] {
+  background-color: #3C8C18 !important;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  
+  /* Critical for smooth animation */
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              background-color 0.3s ease, 
+              box-shadow 0.2s ease;
+  
+  /* Ensure it doesn't look flat */
+  box-shadow: 0 4px 0px rgba(0,0,0,0.1);
+}
+
+/* 1. HOVER STATE: Scales to 1.1 with a slight glow */
+.mic-btn:hover, 
+
+.detailed-aqi-btn:hover, 
+.ph-safety-btn:hover,
+button[class*="-btn"]:hover {
+  transform: scale(1.01);
+  box-shadow: 0 6px 15px rgba(60, 140, 24, 0.4);
+  filter: brightness(1.1);
+}
+
+/* 2. CLICK (ACTIVE) STATE: "Squish" effect */
+/* This makes the button look like it's physically being pressed into the screen */
+.mic-btn:active, 
+ 
+.detailed-aqi-btn:active, 
+.ph-safety-btn:active,
+button[class*="-btn"]:active {
+  transform: scale(0.92); /* Shrinks slightly smaller than original */
+  box-shadow: 0 2px 0px rgba(0,0,0,0.2);
+  transition: transform 0.05s; /* Snappy response for the click */
+}
+
+/* --- Dark Mode Compatibility --- */
+body[data-theme="dark"] .mic-btn,
+
+body[data-theme="dark"] button {
+  background-color: #3C8C18 !important;
+  
+}
+
 
     /* --- 9. ANIMATIONS --- */
     @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
